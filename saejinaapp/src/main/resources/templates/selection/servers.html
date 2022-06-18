@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Server Selection</title>
+</head>
+<body>
+    <div>
+        Logged in as user: <b th:inline="text"> [[${#httpServletRequest.remoteUser}]] </b>
+    </div>
+    <h1>Select a server :</h1>
+    <div>
+        <div th:each="server : ${serverList}">
+            <a th:href="@{/{serverId}(serverId=${server.id})}" th:text="${server.name}"></a>
+        </div>
+    </div>
+</body>
+</html>
