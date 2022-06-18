@@ -40,7 +40,7 @@ public class SecurityConfiguration {
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .redirectUri("{baseUrl}/{action}/oauth2/code/{registrationId}")
-                .scope("guilds", "identify")
+                .scope("identify")
                 .authorizationUri("https://discord.com/api/oauth2/authorize")
                 .tokenUri("https://discord.com/api/oauth2/token")
                 .userInfoUri("https://discord.com/api/users/@me")
