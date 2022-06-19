@@ -34,12 +34,7 @@ public class SelectionController {
     public String showChannelSelection(Model model, @PathVariable Long serverId, @AuthenticationPrincipal OAuth2User principal) {
         String userId = principal.getName();
 
-        boolean isUserInServer = service.isUserInServer(userId, serverId);
-        if(!isUserInServer) {
-            return "redirect:/";
-        }
-
-        List<TextChannel> textChannels = service.getServerTextChannels(serverId);
+        List<TextChannel> textChannels = service.getVisibleServerTextChannels(userId, serverId);
         model.addAttribute("channels", textChannels);
         model.addAttribute("serverId", serverId);
 

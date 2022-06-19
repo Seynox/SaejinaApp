@@ -1,5 +1,6 @@
 package fr.seynox.saejinaapp.controllers;
 
+import fr.seynox.saejinaapp.exceptions.ServerNotAccessibleException;
 import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.TextChannel;
 import fr.seynox.saejinaapp.services.DiscordService;
@@ -79,8 +80,7 @@ class SelectionControllerTests {
                 new TextChannel(987654L, "Channel Two")
         );
 
-        when(service.isUserInServer(userId, serverId)).thenReturn(true);
-        when(service.getServerTextChannels(serverId)).thenReturn(channels);
+        when(service.getVisibleServerTextChannels(userId, serverId)).thenReturn(channels);
         // WHEN
         mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -88,8 +88,7 @@ class SelectionControllerTests {
                 .andExpect(model().attribute("serverId", serverId));
 
         // THEN
-        verify(service, times(1)).isUserInServer(userId, serverId);
-        verify(service, times(1)).getServerTextChannels(serverId);
+        verify(service, times(1)).getVisibleServerTextChannels(userId, serverId);
     }
 
     @Test
@@ -102,15 +101,14 @@ class SelectionControllerTests {
         RequestBuilder request = get(requestUri)
                 .with(oauth2Login().attributes(attrs -> attrs.put("sub", userId))); // "sub" is the default nameAttributeKey
 
-        when(service.isUserInServer(userId, serverId)).thenReturn(false);
+        when(service.getVisibleServerTextChannels(userId, serverId)).thenThrow(new ServerNotAccessibleException());
         // WHEN
         mockMvc.perform(request)
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
+                .andExpect(status().isOk())
+                .andExpect(view().name("/exception/server_access"));
 
         // THEN
-        verify(service, times(1)).isUserInServer(userId, serverId);
-        verify(service, never()).getServerTextChannels(any());
+        verify(service, times(1)).getVisibleServerTextChannels(userId, serverId);
     }
 
     @Test
@@ -126,8 +124,7 @@ class SelectionControllerTests {
                 .andExpect(status().isUnauthorized());
 
         // THEN
-        verify(service, never()).isUserInServer(any(), eq(serverId));
-        verify(service, never()).getServerTextChannels(any());
+        verify(service, never()).getVisibleServerTextChannels(any(), any());
     }
 
 }

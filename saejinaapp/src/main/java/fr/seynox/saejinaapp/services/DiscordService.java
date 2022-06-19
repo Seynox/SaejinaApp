@@ -1,8 +1,10 @@
 package fr.seynox.saejinaapp.services;
 
+import fr.seynox.saejinaapp.exceptions.ServerNotAccessibleException;
 import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.TextChannel;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -30,24 +32,19 @@ public class DiscordService {
                 .toList();
     }
 
-    public boolean isUserInServer(String userId, Long serverId) {
-        Guild server = jda.getGuildById(serverId);
-
-        if(server != null) {
-            Member member = server.retrieveMemberById(userId).complete();
-            return member != null;
-        }
-
-        return false;
-    }
-
-    public List<TextChannel> getServerTextChannels(Long serverId) {
+    public List<TextChannel> getVisibleServerTextChannels(String userId, Long serverId) {
         Guild server = jda.getGuildById(serverId);
         if(server == null) {
-            return List.of();
+            throw new ServerNotAccessibleException();
+        }
+
+        Member member = server.retrieveMemberById(userId).complete();
+        if(member == null) {
+            throw new ServerNotAccessibleException();
         }
 
         return server.getTextChannels().stream()
+                .filter(channel -> member.hasPermission(channel, Permission.VIEW_CHANNEL))
                 .map(channel -> new TextChannel(channel.getIdLong(), channel.getName()))
                 .toList();
     }
