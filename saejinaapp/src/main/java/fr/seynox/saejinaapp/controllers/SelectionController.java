@@ -1,5 +1,6 @@
 package fr.seynox.saejinaapp.controllers;
 
+import fr.seynox.saejinaapp.exceptions.ServerNotAccessibleException;
 import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.TextChannel;
 import fr.seynox.saejinaapp.services.DiscordService;
@@ -21,6 +22,13 @@ public class SelectionController {
         this.service = service;
     }
 
+    /**
+     * Show the server selection menu.
+     * Only shows mutual servers
+     * @param model The model used in the thymeleaf template
+     * @param principal The logged-in user
+     * @return The path to the Thymeleaf template
+     */
     @GetMapping("/")
     public String showServerSelection(Model model, @AuthenticationPrincipal OAuth2User principal) {
         String userId = principal.getName();
@@ -30,6 +38,15 @@ public class SelectionController {
         return "/selection/servers";
     }
 
+    /**
+     * Show to channel selection menu for the given server
+     * @param model The model used in the thymeleaf template
+     * @param serverId The server selected
+     * @param principal The logged-in user
+     * @throws ServerNotAccessibleException When the server is not accessible by the user/bot.
+     * Handled by {@link ExceptionController#showServerNotAccessible(Exception, Model)}
+     * @return The path to the Thymeleaf template
+     */
     @GetMapping("/{serverId}")
     public String showChannelSelection(Model model, @PathVariable Long serverId, @AuthenticationPrincipal OAuth2User principal) {
         String userId = principal.getName();

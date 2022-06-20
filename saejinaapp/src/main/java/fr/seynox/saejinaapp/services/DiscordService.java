@@ -21,6 +21,10 @@ public class DiscordService {
         this.jda = jda;
     }
 
+    /**
+     * Get all mutual servers for the given user
+     * @return An empty list if the user is null
+     */
     public List<Server> getUserServers(String userId) {
         User user = jda.retrieveUserById(userId).complete();
         if(user == null) {
@@ -32,6 +36,11 @@ public class DiscordService {
                 .toList();
     }
 
+    /**
+     * Get all server text channels that are visible to the given user
+     * @throws ServerNotAccessibleException When the user is null, or when the bot or user does not have access to the server
+     * @return A list of text channels visible to the user
+     */
     public List<TextChannel> getVisibleServerTextChannels(String userId, Long serverId) {
         Guild server = jda.getGuildById(serverId);
         if(server == null) {
