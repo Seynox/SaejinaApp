@@ -1,15 +1,16 @@
 package fr.seynox.saejinaapp.services;
 
-import fr.seynox.saejinaapp.exceptions.ServerNotAccessibleException;
 import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.TextChannel;
+import fr.seynox.saejinaapp.models.TextChannelAction;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -38,23 +39,26 @@ public class DiscordService {
 
     /**
      * Get all server text channels that are visible to the given user
-     * @throws ServerNotAccessibleException When the user is null, or when the bot or user does not have access to the server
      * @return A list of text channels visible to the user
      */
-    public List<TextChannel> getVisibleServerTextChannels(String userId, Long serverId) {
-        Guild server = jda.getGuildById(serverId);
-        if(server == null) {
-            throw new ServerNotAccessibleException();
-        }
-
-        Member member = server.retrieveMemberById(userId).complete();
-        if(member == null) {
-            throw new ServerNotAccessibleException();
-        }
+    public List<TextChannel> getVisibleServerTextChannels(@NonNull Member member) {
+        Guild server = member.getGuild();
 
         return server.getTextChannels().stream()
-                .filter(channel -> member.hasPermission(channel, Permission.VIEW_CHANNEL))
+                .filter(member::hasAccess)
                 .map(channel -> new TextChannel(channel.getIdLong(), channel.getName()))
+                .toList();
+    }
+
+    /**
+     * Get a list of all possible actions for the user on the channel
+     * @param member The user get the actions
+     * @param channel The channel the action is being applied to
+     * @return The list of allowed channel actions
+     */
+    public List<TextChannelAction> getPossibleActionsForChannel(Member member, net.dv8tion.jda.api.entities.TextChannel channel) {
+        return Arrays.stream(TextChannelAction.values())
+                .filter(action -> action.isAllowed(member, channel))
                 .toList();
     }
 }

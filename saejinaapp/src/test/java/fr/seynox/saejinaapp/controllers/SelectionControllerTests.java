@@ -3,8 +3,11 @@ package fr.seynox.saejinaapp.controllers;
 import fr.seynox.saejinaapp.exceptions.ServerNotAccessibleException;
 import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.TextChannel;
+import fr.seynox.saejinaapp.services.MemberAccessService;
 import fr.seynox.saejinaapp.services.DiscordService;
+import net.dv8tion.jda.api.entities.Member;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,6 +29,9 @@ class SelectionControllerTests {
 
     @MockBean
     private DiscordService service;
+
+    @MockBean
+    private MemberAccessService accessService;
 
     @Test
     void showServerSelectionTest() throws Exception {
@@ -80,7 +86,10 @@ class SelectionControllerTests {
                 new TextChannel(987654L, "Channel Two")
         );
 
-        when(service.getVisibleServerTextChannels(userId, serverId)).thenReturn(channels);
+        Member member = Mockito.mock(Member.class);
+
+        when(accessService.getServerMember(userId, serverId)).thenReturn(member);
+        when(service.getVisibleServerTextChannels(member)).thenReturn(channels);
         // WHEN
         mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -88,7 +97,8 @@ class SelectionControllerTests {
                 .andExpect(model().attribute("serverId", serverId));
 
         // THEN
-        verify(service, times(1)).getVisibleServerTextChannels(userId, serverId);
+        verify(accessService, times(1)).getServerMember(userId, serverId);
+        verify(service, times(1)).getVisibleServerTextChannels(member);
     }
 
     @Test
@@ -101,14 +111,15 @@ class SelectionControllerTests {
         RequestBuilder request = get(requestUri)
                 .with(oauth2Login().attributes(attrs -> attrs.put("sub", userId))); // "sub" is the default nameAttributeKey
 
-        when(service.getVisibleServerTextChannels(userId, serverId)).thenThrow(new ServerNotAccessibleException());
+        when(accessService.getServerMember(userId, serverId)).thenThrow(new ServerNotAccessibleException());
         // WHEN
         mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(view().name("/exception/server_access"));
 
         // THEN
-        verify(service, times(1)).getVisibleServerTextChannels(userId, serverId);
+        verify(accessService, times(1)).getServerMember(userId, serverId);
+        verify(service, never()).getVisibleServerTextChannels(any());
     }
 
     @Test
@@ -124,7 +135,8 @@ class SelectionControllerTests {
                 .andExpect(status().isUnauthorized());
 
         // THEN
-        verify(service, never()).getVisibleServerTextChannels(any(), any());
+        verify(accessService, never()).getServerMember(any(), any());
+        verify(service, never()).getVisibleServerTextChannels(any());
     }
 
 }

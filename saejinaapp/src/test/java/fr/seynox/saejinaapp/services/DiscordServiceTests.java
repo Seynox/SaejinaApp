@@ -1,11 +1,8 @@
 package fr.seynox.saejinaapp.services;
 
-import fr.seynox.saejinaapp.exceptions.ServerNotAccessibleException;
 import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.TextChannel;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
@@ -20,7 +17,6 @@ import org.mockito.Mockito;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.*;
 
 class DiscordServiceTests {
@@ -55,7 +51,7 @@ class DiscordServiceTests {
 
         List<Server> result;
 
-        when(jda.retrieveUserById(userId)).thenReturn(new CompletedRestAction<>(jda, user));
+        when(jda.retrieveUserById(userId)).thenReturn(new CompletedRestAction<>(null, user));
         when(user.getMutualGuilds()).thenReturn(guilds);
         // WHEN
         result = service.getUserServers(userId);
@@ -73,7 +69,7 @@ class DiscordServiceTests {
 
         List<Server> result;
 
-        when(jda.retrieveUserById(userId)).thenReturn(new CompletedRestAction<>(jda, null));
+        when(jda.retrieveUserById(userId)).thenReturn(new CompletedRestAction<>(null, null));
         // WHEN
         result = service.getUserServers(userId);
 
@@ -85,9 +81,6 @@ class DiscordServiceTests {
     @Test
     void getVisibleServerTextChannelsTest() {
         // GIVEN
-        long serverId = 123456;
-        String userId = "654321";
-
         GuildImpl guild = Mockito.mock(GuildImpl.class);
         Member member = Mockito.mock(Member.class);
 
@@ -103,54 +96,34 @@ class DiscordServiceTests {
 
         List<TextChannel> result;
 
-        when(jda.getGuildById(serverId)).thenReturn(guild);
+        when(member.getGuild()).thenReturn(guild);
         when(guild.getTextChannels()).thenReturn(channels);
-        when(guild.retrieveMemberById(userId)).thenReturn(new CompletedRestAction<>(jda, member));
-        when(member.hasPermission(any(GuildChannel.class), eq(Permission.VIEW_CHANNEL))).thenReturn(true);
+        when(member.hasAccess(any())).thenReturn(true);
         // WHEN
-        result = service.getVisibleServerTextChannels(userId, serverId);
+        result = service.getVisibleServerTextChannels(member);
 
         // THEN
-        verify(jda, times(1)).getGuildById(serverId);
+        verify(member, times(1)).getGuild();
         verify(guild, times(1)).getTextChannels();
+        verify(member, times(2)).hasAccess(any());
         assertThat(result).containsExactlyElementsOf(expected);
-    }
-
-    @Test
-    void getNullServerTextChannelsTest() {
-        // GIVEN
-        long serverId = 123456;
-        String userId = "654321";
-
-        when(jda.getGuildById(serverId)).thenReturn(null);
-
-        // WHEN
-        assertThatExceptionOfType(ServerNotAccessibleException.class)
-                .isThrownBy(() -> service.getVisibleServerTextChannels(userId, serverId));
-
-        // THEN
-        verify(jda, times(1)).getGuildById(serverId);
     }
 
     @Test
     void getVisibleServerTextChannelsWithNoChannelTest() {
         // GIVEN
-        long serverId = 123456;
-        String userId = "654321";
-
         GuildImpl guild = Mockito.mock(GuildImpl.class);
         Member member = Mockito.mock(Member.class);
 
         List<TextChannel> result;
 
-        when(jda.getGuildById(serverId)).thenReturn(guild);
+        when(member.getGuild()).thenReturn(guild);
         when(guild.getTextChannels()).thenReturn(List.of());
-        when(guild.retrieveMemberById(userId)).thenReturn(new CompletedRestAction<>(jda, member));
         // WHEN
-        result = service.getVisibleServerTextChannels(userId, serverId);
+        result = service.getVisibleServerTextChannels(member);
 
         // THEN
-        verify(jda, times(1)).getGuildById(serverId);
+        verify(member, times(1)).getGuild();
         verify(guild, times(1)).getTextChannels();
         assertThat(result).isEmpty();
     }
@@ -158,9 +131,6 @@ class DiscordServiceTests {
     @Test
     void filterInvisibleChannelsTest() {
         // GIVEN
-        long serverId = 123456;
-        String userId = "654321";
-
         GuildImpl guild = Mockito.mock(GuildImpl.class);
         Member member = Mockito.mock(Member.class);
 
@@ -176,16 +146,15 @@ class DiscordServiceTests {
 
         List<TextChannel> result;
 
-        when(jda.getGuildById(serverId)).thenReturn(guild);
+        when(member.getGuild()).thenReturn(guild);
         when(guild.getTextChannels()).thenReturn(channels);
-        when(guild.retrieveMemberById(userId)).thenReturn(new CompletedRestAction<>(jda, member));
-        when(member.hasPermission(invisibleChannel, Permission.VIEW_CHANNEL)).thenReturn(false);
-        when(member.hasPermission(visibleChannel, Permission.VIEW_CHANNEL)).thenReturn(true);
+        when(member.hasAccess(invisibleChannel)).thenReturn(false);
+        when(member.hasAccess(visibleChannel)).thenReturn(true);
         // WHEN
-        result = service.getVisibleServerTextChannels(userId, serverId);
+        result = service.getVisibleServerTextChannels(member);
 
         // THEN
-        verify(jda, times(1)).getGuildById(serverId);
+        verify(member, times(1)).getGuild();
         verify(guild, times(1)).getTextChannels();
         assertThat(result).containsExactlyElementsOf(expected);
     }

@@ -3,7 +3,9 @@ package fr.seynox.saejinaapp.controllers;
 import fr.seynox.saejinaapp.exceptions.ServerNotAccessibleException;
 import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.TextChannel;
+import fr.seynox.saejinaapp.services.MemberAccessService;
 import fr.seynox.saejinaapp.services.DiscordService;
+import net.dv8tion.jda.api.entities.Member;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
@@ -17,9 +19,11 @@ import java.util.List;
 public class SelectionController {
 
     private final DiscordService service;
+    private final MemberAccessService serverService;
 
-    public SelectionController(DiscordService service) {
+    public SelectionController(DiscordService service, MemberAccessService serverService) {
         this.service = service;
+        this.serverService = serverService;
     }
 
     /**
@@ -51,7 +55,9 @@ public class SelectionController {
     public String showChannelSelection(Model model, @PathVariable Long serverId, @AuthenticationPrincipal OAuth2User principal) {
         String userId = principal.getName();
 
-        List<TextChannel> textChannels = service.getVisibleServerTextChannels(userId, serverId);
+        Member member = serverService.getServerMember(userId, serverId);
+        List<TextChannel> textChannels = service.getVisibleServerTextChannels(member);
+
         model.addAttribute("channels", textChannels);
         model.addAttribute("serverId", serverId);
 
