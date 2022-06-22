@@ -1,6 +1,6 @@
 package fr.seynox.saejinaapp.controllers;
 
-import fr.seynox.saejinaapp.exceptions.ServerNotAccessibleException;
+import fr.seynox.saejinaapp.exceptions.ResourceNotAccessibleException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ExceptionController {
 
     /**
-     * Handle the ServerNotAccessible exception
+     * Handles {@link ResourceNotAccessibleException}
      * @return The path to the Thymeleaf template
      */
-    @ExceptionHandler(ServerNotAccessibleException.class)
-    public String showServerNotAccessible(Exception exception, Model model) {
+    @ExceptionHandler(ResourceNotAccessibleException.class)
+    public String showResourceNotAccessible(Exception exception, Model model) {
 
         model.addAttribute("message", exception.getMessage());
-        return "/exception/server_access";
+        return "/exception/resource_access";
     }
 
     /**

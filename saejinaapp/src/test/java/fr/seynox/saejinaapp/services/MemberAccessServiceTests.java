@@ -1,6 +1,6 @@
 package fr.seynox.saejinaapp.services;
 
-import fr.seynox.saejinaapp.exceptions.ServerNotAccessibleException;
+import fr.seynox.saejinaapp.exceptions.ResourceNotAccessibleException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -51,7 +51,7 @@ class MemberAccessServiceTests {
 
         when(jda.getGuildById(serverId)).thenReturn(null);
         // WHEN
-        assertThatExceptionOfType(ServerNotAccessibleException.class)
+        assertThatExceptionOfType(ResourceNotAccessibleException.class)
                 .isThrownBy(() -> service.getServerMember(userId, serverId));
 
         // THEN
@@ -69,7 +69,7 @@ class MemberAccessServiceTests {
         when(jda.getGuildById(serverId)).thenReturn(guild);
         when(guild.retrieveMemberById(userId)).thenReturn(new CompletedRestAction<>(null, null));
         // WHEN
-        assertThatExceptionOfType(ServerNotAccessibleException.class)
+        assertThatExceptionOfType(ResourceNotAccessibleException.class)
                 .isThrownBy(() -> service.getServerMember(userId, serverId));
 
         // THEN
@@ -111,7 +111,7 @@ class MemberAccessServiceTests {
         when(member.hasAccess(channel)).thenReturn(false);
         when(guild.getTextChannelById(channelId)).thenReturn(channel);
         // WHEN
-        assertThatExceptionOfType(ServerNotAccessibleException.class)
+        assertThatExceptionOfType(ResourceNotAccessibleException.class)
                 .isThrownBy(() -> service.getServerTextChannel(member, channelId));
 
         // THEN
@@ -131,7 +131,7 @@ class MemberAccessServiceTests {
         when(member.getGuild()).thenReturn(guild);
         when(guild.getTextChannelById(channelId)).thenReturn(null);
         // WHEN
-        assertThatExceptionOfType(ServerNotAccessibleException.class)
+        assertThatExceptionOfType(ResourceNotAccessibleException.class)
                 .isThrownBy(() -> service.getServerTextChannel(member, channelId));
 
         // THEN

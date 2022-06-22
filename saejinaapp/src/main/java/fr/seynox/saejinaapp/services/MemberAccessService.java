@@ -1,6 +1,6 @@
 package fr.seynox.saejinaapp.services;
 
-import fr.seynox.saejinaapp.exceptions.ServerNotAccessibleException;
+import fr.seynox.saejinaapp.exceptions.ResourceNotAccessibleException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -19,7 +19,7 @@ public class MemberAccessService {
     /**
      * Get the user as member of the given server
      * @param userId The user to get as a member
-     * @throws ServerNotAccessibleException If the bot/user does not have access to the server
+     * @throws ResourceNotAccessibleException If the bot/user does not have access to the server
      */
     public Member getServerMember(String userId, Long serverId) {
 
@@ -32,14 +32,14 @@ public class MemberAccessService {
             }
         }
 
-        throw new ServerNotAccessibleException();
+        throw new ResourceNotAccessibleException();
     }
 
     /**
      * Get the server text channel if accessible to the user
      * @param member The user getting the channel
      * @param channelId The channel to get
-     * @throws ServerNotAccessibleException If the bot/user does not have access to the given channel
+     * @throws ResourceNotAccessibleException If the bot/user does not have access to the given channel
      * @return The server text channel
      */
     public TextChannel getServerTextChannel(Member member, String channelId) {
@@ -49,7 +49,7 @@ public class MemberAccessService {
 
         boolean isChannelAccessible = channel != null && member.hasAccess(channel);
         if(!isChannelAccessible) {
-            throw new ServerNotAccessibleException();
+            throw new ResourceNotAccessibleException();
         }
 
         return channel;

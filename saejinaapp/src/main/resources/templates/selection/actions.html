@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Action Selection</title>
+</head>
+<body>
+    <div>
+        Logged in as user: <b th:inline="text"> [[${#httpServletRequest.remoteUser}]] </b>
+    </div>
+    <h1>Select an action :</h1>
+    <div>
+        <div th:each="action : ${actions}">
+            <a th:href="@{/{serverId}/{channelId}/{actionId}(actionId=${action.getId()}, channelId=${channelId}, serverId=${serverId})}" th:text="${action.getName()}"></a>
+        </div>
+    </div>
+</body>
+</html>

@@ -2,6 +2,8 @@ package fr.seynox.saejinaapp.services;
 
 import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.TextChannel;
+import fr.seynox.saejinaapp.models.TextChannelAction;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -156,6 +159,27 @@ class DiscordServiceTests {
         // THEN
         verify(member, times(1)).getGuild();
         verify(guild, times(1)).getTextChannels();
+        assertThat(result).containsExactlyElementsOf(expected);
+    }
+
+    @Test
+    void getPossibleActionsForChannelTest() {
+        // GIVEN
+        Member member = Mockito.mock(Member.class);
+        net.dv8tion.jda.api.entities.TextChannel channel = Mockito.mock(net.dv8tion.jda.api.entities.TextChannel.class);
+
+        List<TextChannelAction> expected = Arrays.stream(TextChannelAction.values())
+                .filter(action -> !action.getId().equals(TextChannelAction.SET_TICKET_CHANNEL.getId()))
+                .toList();
+
+        List<TextChannelAction> result;
+
+        when(member.hasPermission(Permission.MANAGE_SERVER)).thenReturn(false);
+        when(channel.canTalk(member)).thenReturn(true);
+        // WHEN
+        result = service.getPossibleActionsForChannel(member, channel);
+
+        // THEN
         assertThat(result).containsExactlyElementsOf(expected);
     }
 
