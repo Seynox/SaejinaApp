@@ -80,7 +80,7 @@ class MemberAccessServiceTests {
     @Test
     void getServerTextChannelTest() {
         // GIVEN
-        String channelId = "123456";
+        long channelId = 123456;
 
         Member member = Mockito.mock(Member.class);
         Guild guild = Mockito.mock(Guild.class);
@@ -101,7 +101,7 @@ class MemberAccessServiceTests {
     @Test
     void refuseServerInvisibleTextChannelTest() {
         // GIVEN
-        String channelId = "123456";
+        long channelId = 123456;
 
         Member member = Mockito.mock(Member.class);
         Guild guild = Mockito.mock(Guild.class);
@@ -123,7 +123,7 @@ class MemberAccessServiceTests {
     @Test
     void refuseServerUnknownTextChannel() {
         // GIVEN
-        String channelId = "123456";
+        long channelId = 123456;
 
         Member member = Mockito.mock(Member.class);
         Guild guild = Mockito.mock(Guild.class);

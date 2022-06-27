@@ -76,7 +76,7 @@ public class SelectionController {
      * @return The path to the Thymeleaf template
      */
     @GetMapping("/{serverId}/{channelId}")
-    public String showActionSelection(Model model, @PathVariable Long serverId, @PathVariable String channelId, @AuthenticationPrincipal OAuth2User principal) {
+    public String showActionSelection(Model model, @PathVariable Long serverId, @PathVariable Long channelId, @AuthenticationPrincipal OAuth2User principal) {
         String userId = principal.getName();
 
         Member member = accessService.getServerMember(userId, serverId);

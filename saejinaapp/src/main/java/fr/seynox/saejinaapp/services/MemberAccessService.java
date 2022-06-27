@@ -42,7 +42,7 @@ public class MemberAccessService {
      * @throws ResourceNotAccessibleException If the bot/user does not have access to the given channel
      * @return The server text channel
      */
-    public TextChannel getServerTextChannel(Member member, String channelId) {
+    public TextChannel getServerTextChannel(Member member, Long channelId) {
 
         Guild guild = member.getGuild();
         TextChannel channel = guild.getTextChannelById(channelId);

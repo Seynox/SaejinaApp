@@ -145,7 +145,7 @@ class SelectionControllerTests {
     void showActionSelectionTest() throws Exception {
         // GIVEN
         long serverId = 123456;
-        String channelId = "654321";
+        long channelId = 654321;
 
         String userId = "123654";
 
