@@ -1,6 +1,9 @@
 package fr.seynox.saejinaapp.controllers;
 
 import fr.seynox.saejinaapp.exceptions.ResourceNotAccessibleException;
+import fr.seynox.saejinaapp.exceptions.SaejinaAppException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -8,15 +11,17 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class ExceptionController {
 
+    private static final Logger LOGGER = LogManager.getLogger(ExceptionController.class);
+
     /**
      * Handles {@link ResourceNotAccessibleException}
      * @return The path to the Thymeleaf template
      */
-    @ExceptionHandler(ResourceNotAccessibleException.class)
-    public String showResourceNotAccessible(Exception exception, Model model) {
+    @ExceptionHandler({SaejinaAppException.class})
+    public String showSaejinaAppException(Exception exception, Model model) {
 
         model.addAttribute("message", exception.getMessage());
-        return "/exception/resource_access";
+        return "/exception/error";
     }
 
     /**
@@ -24,7 +29,10 @@ public class ExceptionController {
      * @return The path to the Thymeleaf template
      */
     @ExceptionHandler(Exception.class)
-    public String showErrorPage() {
+    public String showErrorPage(Exception exception, Model model) {
+        LOGGER.error("An error occurred", exception);
+
+        model.addAttribute("message", "An error occurred");
         return "/exception/error";
     }
 
