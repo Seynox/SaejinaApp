@@ -117,7 +117,7 @@ class SelectionControllerTests {
         // WHEN
         mockMvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(view().name("/exception/resource_access"));
+                .andExpect(view().name("/exception/error"));
 
         // THEN
         verify(accessService, times(1)).getServerMember(userId, serverId);
