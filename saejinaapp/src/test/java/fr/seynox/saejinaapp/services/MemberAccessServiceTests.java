@@ -1,5 +1,6 @@
 package fr.seynox.saejinaapp.services;
 
+import fr.seynox.saejinaapp.exceptions.PermissionException;
 import fr.seynox.saejinaapp.exceptions.ResourceNotAccessibleException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -138,6 +139,84 @@ class MemberAccessServiceTests {
         verify(member, times(1)).getGuild();
         verify(member, never()).hasAccess(any());
         verify(guild, times(1)).getTextChannelById(channelId);
+    }
+
+    @Test
+    void getWritableServerTextChannelTest() {
+        // GIVEN
+        long channelId = 123456;
+
+        Member member = Mockito.mock(Member.class);
+        Guild guild = Mockito.mock(Guild.class);
+        TextChannel channel = Mockito.mock(TextChannel.class);
+
+        when(member.getGuild()).thenReturn(guild);
+        when(member.hasAccess(channel)).thenReturn(true);
+        when(guild.getTextChannelById(channelId)).thenReturn(channel);
+        when(channel.canTalk()).thenReturn(true);
+        when(channel.canTalk(member)).thenReturn(true);
+        // WHEN
+        service.getWritableServerTextChannel(member, channelId);
+
+        // THEN
+        verify(member, times(1)).getGuild();
+        verify(member, times(1)).hasAccess(channel);
+        verify(guild, times(1)).getTextChannelById(channelId);
+        verify(channel, times(1)).canTalk(member);
+        verify(channel, times(1)).canTalk();
+    }
+
+    @Test
+    void refuseUserNonWritableServerTextChannelTest() {
+        // GIVEN
+        long channelId = 123456;
+
+        Member member = Mockito.mock(Member.class);
+        Guild guild = Mockito.mock(Guild.class);
+        TextChannel channel = Mockito.mock(TextChannel.class);
+
+        when(member.getGuild()).thenReturn(guild);
+        when(member.hasAccess(channel)).thenReturn(true);
+        when(guild.getTextChannelById(channelId)).thenReturn(channel);
+        when(channel.canTalk(member)).thenReturn(false);
+        // WHEN
+        assertThatExceptionOfType(PermissionException.class)
+                .isThrownBy(() -> service.getWritableServerTextChannel(member, channelId))
+                .withMessage("You do not have the permission to talk in this channel");
+
+        // THEN
+        verify(member, times(1)).getGuild();
+        verify(member, times(1)).hasAccess(channel);
+        verify(guild, times(1)).getTextChannelById(channelId);
+        verify(channel, times(1)).canTalk(member);
+        verify(channel, never()).canTalk();
+    }
+
+    @Test
+    void refuseBotNonWritableServerTextChannelTest() {
+        // GIVEN
+        long channelId = 123456;
+
+        Member member = Mockito.mock(Member.class);
+        Guild guild = Mockito.mock(Guild.class);
+        TextChannel channel = Mockito.mock(TextChannel.class);
+
+        when(member.getGuild()).thenReturn(guild);
+        when(member.hasAccess(channel)).thenReturn(true);
+        when(guild.getTextChannelById(channelId)).thenReturn(channel);
+        when(channel.canTalk(member)).thenReturn(true);
+        when(channel.canTalk()).thenReturn(false);
+        // WHEN
+        assertThatExceptionOfType(PermissionException.class)
+                .isThrownBy(() -> service.getWritableServerTextChannel(member, channelId))
+                .withMessage("I do not have the permission to talk in this channel. Please contact the server administrators");
+
+        // THEN
+        verify(member, times(1)).getGuild();
+        verify(member, times(1)).hasAccess(channel);
+        verify(guild, times(1)).getTextChannelById(channelId);
+        verify(channel, times(1)).canTalk(member);
+        verify(channel, times(1)).canTalk();
     }
 
 }

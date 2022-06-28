@@ -1,5 +1,6 @@
 package fr.seynox.saejinaapp.services;
 
+import fr.seynox.saejinaapp.exceptions.PermissionException;
 import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.TextChannel;
 import fr.seynox.saejinaapp.models.TextChannelAction;
@@ -7,6 +8,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.dv8tion.jda.internal.JDAImpl;
 import net.dv8tion.jda.internal.entities.GuildImpl;
@@ -20,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.*;
 
 class DiscordServiceTests {
@@ -181,6 +184,89 @@ class DiscordServiceTests {
 
         // THEN
         assertThat(result).containsExactlyElementsOf(expected);
+    }
+
+    @Test
+    void sendMessageInChannelTest() {
+        // GIVEN
+        String message = "Hello world";
+
+        Member member = Mockito.mock(Member.class);
+        net.dv8tion.jda.api.entities.TextChannel channel = Mockito.mock(net.dv8tion.jda.api.entities.TextChannel.class);
+        MessageAction action = Mockito.mock(MessageAction.class);
+
+        when(channel.sendMessage(message)).thenReturn(action);
+        // WHEN
+        service.sendMessageInChannel(member, channel, message);
+
+        // THEN
+        verify(member, never()).hasPermission(any(Permission.class));
+        verify(channel, times(1)).sendMessage(message);
+        verify(action, times(1)).queue();
+    }
+
+    @Test
+    void sendEveryoneMessageInChannelTest() {
+        // GIVEN
+        String message = "Hello @everyone !";
+
+        Member member = Mockito.mock(Member.class);
+        net.dv8tion.jda.api.entities.TextChannel channel = Mockito.mock(net.dv8tion.jda.api.entities.TextChannel.class);
+        MessageAction action = Mockito.mock(MessageAction.class);
+
+        when(channel.sendMessage(message)).thenReturn(action);
+        when(member.hasPermission(Permission.MESSAGE_MENTION_EVERYONE)).thenReturn(true);
+        // WHEN
+        service.sendMessageInChannel(member, channel, message);
+
+        // THEN
+        verify(member, times(1)).hasPermission(Permission.MESSAGE_MENTION_EVERYONE);
+        verify(channel, times(1)).sendMessage(message);
+        verify(action, times(1)).queue();
+    }
+
+    @Test
+    void refuseUnauthorizedEveryoneMessageInChannelTest() {
+        // GIVEN
+        String message = "Hello @everyone !";
+
+        Member member = Mockito.mock(Member.class);
+        net.dv8tion.jda.api.entities.TextChannel channel = Mockito.mock(net.dv8tion.jda.api.entities.TextChannel.class);
+        MessageAction action = Mockito.mock(MessageAction.class);
+
+        when(channel.sendMessage(message)).thenReturn(action);
+        when(member.hasPermission(Permission.MESSAGE_MENTION_EVERYONE)).thenReturn(false);
+        // WHEN
+        assertThatExceptionOfType(PermissionException.class)
+                .isThrownBy(() -> service.sendMessageInChannel(member, channel, message))
+                .withMessage("You do not have the permission to mention everyone");
+
+        // THEN
+        verify(member, times(1)).hasPermission(Permission.MESSAGE_MENTION_EVERYONE);
+        verify(channel, never()).sendMessage(any(String.class));
+        verify(action, never()).queue();
+    }
+
+    @Test
+    void refuseUnauthorizedHereMessageInChannelTest() {
+        // GIVEN
+        String message = "Hello @here !";
+
+        Member member = Mockito.mock(Member.class);
+        net.dv8tion.jda.api.entities.TextChannel channel = Mockito.mock(net.dv8tion.jda.api.entities.TextChannel.class);
+        MessageAction action = Mockito.mock(MessageAction.class);
+
+        when(channel.sendMessage(message)).thenReturn(action);
+        when(member.hasPermission(Permission.MESSAGE_MENTION_EVERYONE)).thenReturn(false);
+        // WHEN
+        assertThatExceptionOfType(PermissionException.class)
+                .isThrownBy(() -> service.sendMessageInChannel(member, channel, message))
+                .withMessage("You do not have the permission to mention everyone");
+
+        // THEN
+        verify(member, times(1)).hasPermission(Permission.MESSAGE_MENTION_EVERYONE);
+        verify(channel, never()).sendMessage(any(String.class));
+        verify(action, never()).queue();
     }
 
 }

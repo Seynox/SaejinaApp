@@ -1,9 +1,11 @@
 package fr.seynox.saejinaapp.services;
 
+import fr.seynox.saejinaapp.exceptions.PermissionException;
 import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.TextChannel;
 import fr.seynox.saejinaapp.models.TextChannelAction;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -12,6 +14,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static net.dv8tion.jda.api.entities.Message.MentionType.EVERYONE;
+import static net.dv8tion.jda.api.entities.Message.MentionType.HERE;
 
 @Service
 public class DiscordService {
@@ -60,5 +65,25 @@ public class DiscordService {
         return Arrays.stream(TextChannelAction.values())
                 .filter(action -> action.isAllowed(member, channel))
                 .toList();
+    }
+
+    public void sendMessageInChannel(Member member, net.dv8tion.jda.api.entities.TextChannel channel, String content) {
+
+        boolean mentionsEveryone = EVERYONE.getPattern()
+                .matcher(content)
+                .find();
+
+        boolean mentionsHere = HERE.getPattern()
+                .matcher(content)
+                .find();
+
+        if(mentionsEveryone || mentionsHere) {
+            boolean canMentionEveryone = member.hasPermission(Permission.MESSAGE_MENTION_EVERYONE);
+            if(!canMentionEveryone)  {
+                throw new PermissionException("You do not have the permission to mention everyone");
+            }
+        }
+
+        channel.sendMessage(content).queue();
     }
 }
