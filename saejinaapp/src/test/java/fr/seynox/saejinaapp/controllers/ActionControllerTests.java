@@ -117,7 +117,7 @@ class ActionControllerTests {
         // WHEN
         mockMvc.perform(request)
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl(requestUri + "?success"));
+                .andExpect(redirectedUrl("?success"));
 
         // THEN
         verify(accessService, times(1)).getServerMember(userId, serverId);

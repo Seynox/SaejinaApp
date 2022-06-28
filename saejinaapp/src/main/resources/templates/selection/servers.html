@@ -13,7 +13,7 @@
     <h1>Select a server :</h1>
     <div>
         <div th:each="server : ${serverList}">
-            <a th:href="@{/{serverId}(serverId=${server.id})}" th:text="${server.name}"></a>
+            <a th:href="@{/{serverId}/(serverId=${server.id})}" th:text="${server.name}"></a>
         </div>
     </div>
 </body>

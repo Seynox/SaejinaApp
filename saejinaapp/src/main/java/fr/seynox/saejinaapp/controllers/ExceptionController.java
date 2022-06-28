@@ -30,7 +30,7 @@ public class ExceptionController {
      */
     @ExceptionHandler(Exception.class)
     public String showErrorPage(Exception exception, Model model) {
-        LOGGER.error("An error occurred", exception);
+        LOGGER.debug("An error occurred", exception);
 
         model.addAttribute("message", "An error occurred");
         return "/exception/error";

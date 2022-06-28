@@ -96,8 +96,7 @@ class SelectionControllerTests {
         // WHEN
         mockMvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("channels", channels))
-                .andExpect(model().attribute("serverId", serverId));
+                .andExpect(model().attribute("channels", channels));
 
         // THEN
         verify(accessService, times(1)).getServerMember(userId, serverId);

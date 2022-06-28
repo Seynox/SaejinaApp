@@ -52,7 +52,7 @@ public class ActionController {
 
         service.sendMessageInChannel(member, channel, message.getContent());
 
-        return "redirect:/%s/%s/send_message?success".formatted(serverId, channelId);
+        return "redirect:?success";
     }
 
 }

@@ -13,7 +13,7 @@
     <h1>Select a channel :</h1>
     <div>
         <div th:each="channel : ${channels}">
-            <a th:href="@{/{serverId}/{channelId}(channelId=${channel.id}, serverId=${serverId})}" th:text="${channel.name}"></a>
+            <a th:href="@{{channelId}/(channelId=${channel.id})}" th:text="${channel.name}"></a>
         </div>
     </div>
 </body>

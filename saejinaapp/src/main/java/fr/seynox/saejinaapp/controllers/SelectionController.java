@@ -61,7 +61,6 @@ public class SelectionController {
         List<DiscordTextChannel> discordTextChannels = service.getVisibleServerTextChannels(member);
 
         model.addAttribute("channels", discordTextChannels);
-        model.addAttribute("serverId", serverId);
 
         return "/selection/channels";
     }
@@ -86,8 +85,6 @@ public class SelectionController {
         List<TextChannelAction> actions = service.getPossibleActionsForChannel(member, channel);
         model.addAttribute("actions", actions);
 
-        model.addAttribute("serverId", serverId);
-        model.addAttribute("channelId", channelId);
         return "/selection/actions";
     }
 

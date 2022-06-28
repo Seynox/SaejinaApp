@@ -13,7 +13,7 @@
     <h1>Select an action :</h1>
     <div>
         <div th:each="action : ${actions}">
-            <a th:href="@{/{serverId}/{channelId}/{actionId}(actionId=${action.getId()}, channelId=${channelId}, serverId=${serverId})}" th:text="${action.getName()}"></a>
+            <a th:href="@{{actionId}/(actionId=${action.getId()})}" th:text="${action.getName()}"></a>
         </div>
     </div>
 </body>
