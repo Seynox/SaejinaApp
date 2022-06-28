@@ -21,6 +21,9 @@ import java.util.List;
 public class SelectionController {
 
     private static final String SELECTION_TEMPLATE = "/selection/select";
+    private static final String SELECTABLE_LIST_ATTRIBUTE = "selectableList";
+    private static final String PAGE_TITLE_ATTRIBUTE = "pageTitle";
+    private static final String MAIN_TITLE_ATTRIBUTE = "title";
 
     private final DiscordService service;
     private final MemberAccessService accessService;
@@ -42,9 +45,9 @@ public class SelectionController {
         String userId = principal.getName();
         List<Server> serverList = service.getUserServers(userId);
 
-        model.addAttribute("selectableList", serverList);
-        model.addAttribute("pageTitle", "Server Selection");
-        model.addAttribute("title", "Select a server :");
+        model.addAttribute(SELECTABLE_LIST_ATTRIBUTE, serverList);
+        model.addAttribute(PAGE_TITLE_ATTRIBUTE, "Server Selection");
+        model.addAttribute(MAIN_TITLE_ATTRIBUTE, "Select a server :");
 
         return SELECTION_TEMPLATE;
     }
@@ -65,9 +68,9 @@ public class SelectionController {
         Member member = accessService.getServerMember(userId, serverId);
         List<DiscordTextChannel> discordTextChannels = service.getVisibleServerTextChannels(member);
 
-        model.addAttribute("selectableList", discordTextChannels);
-        model.addAttribute("pageTitle", "Channel Selection");
-        model.addAttribute("title", "Select a channel :");
+        model.addAttribute(SELECTABLE_LIST_ATTRIBUTE, discordTextChannels);
+        model.addAttribute(PAGE_TITLE_ATTRIBUTE, "Channel Selection");
+        model.addAttribute(MAIN_TITLE_ATTRIBUTE, "Select a channel :");
 
         return SELECTION_TEMPLATE;
     }
@@ -91,9 +94,9 @@ public class SelectionController {
 
         List<TextChannelAction> actions = service.getPossibleActionsForChannel(member, channel);
 
-        model.addAttribute("selectableList", actions);
-        model.addAttribute("pageTitle", "Action Selection");
-        model.addAttribute("title", "Select an action :");
+        model.addAttribute(SELECTABLE_LIST_ATTRIBUTE, actions);
+        model.addAttribute(PAGE_TITLE_ATTRIBUTE, "Action Selection");
+        model.addAttribute(MAIN_TITLE_ATTRIBUTE, "Select an action :");
 
         return SELECTION_TEMPLATE;
     }
