@@ -2,11 +2,12 @@ package fr.seynox.saejinaapp.controllers;
 
 import fr.seynox.saejinaapp.exceptions.ResourceNotAccessibleException;
 import fr.seynox.saejinaapp.models.Server;
-import fr.seynox.saejinaapp.models.TextChannel;
+import fr.seynox.saejinaapp.models.DiscordTextChannel;
 import fr.seynox.saejinaapp.models.TextChannelAction;
 import fr.seynox.saejinaapp.services.MemberAccessService;
 import fr.seynox.saejinaapp.services.DiscordService;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,9 +84,9 @@ class SelectionControllerTests {
         RequestBuilder request = get(requestUri)
                 .with(oauth2Login().attributes(attrs -> attrs.put("sub", userId))); // "sub" is the default nameAttributeKey
 
-        List<TextChannel> channels = List.of(
-                new TextChannel(123456L, "Channel One"),
-                new TextChannel(987654L, "Channel Two")
+        List<DiscordTextChannel> channels = List.of(
+                new DiscordTextChannel(123456L, "Channel One"),
+                new DiscordTextChannel(987654L, "Channel Two")
         );
 
         Member member = Mockito.mock(Member.class);
@@ -150,7 +151,7 @@ class SelectionControllerTests {
         String userId = "123654";
 
         Member member = Mockito.mock(Member.class);
-        net.dv8tion.jda.api.entities.TextChannel channel = Mockito.mock(net.dv8tion.jda.api.entities.TextChannel.class);
+        TextChannel channel = Mockito.mock(TextChannel.class);
 
         String requestUri = "/%s/%s".formatted(serverId, channelId);
         RequestBuilder request = get(requestUri)

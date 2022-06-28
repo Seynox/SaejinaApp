@@ -2,12 +2,13 @@ package fr.seynox.saejinaapp.services;
 
 import fr.seynox.saejinaapp.exceptions.PermissionException;
 import fr.seynox.saejinaapp.models.Server;
-import fr.seynox.saejinaapp.models.TextChannel;
+import fr.seynox.saejinaapp.models.DiscordTextChannel;
 import fr.seynox.saejinaapp.models.TextChannelAction;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -46,12 +47,12 @@ public class DiscordService {
      * Get all server text channels that are visible to the given user
      * @return A list of text channels visible to the user
      */
-    public List<TextChannel> getVisibleServerTextChannels(@NonNull Member member) {
+    public List<DiscordTextChannel> getVisibleServerTextChannels(@NonNull Member member) {
         Guild server = member.getGuild();
 
         return server.getTextChannels().stream()
                 .filter(member::hasAccess)
-                .map(channel -> new TextChannel(channel.getIdLong(), channel.getName()))
+                .map(channel -> new DiscordTextChannel(channel.getIdLong(), channel.getName()))
                 .toList();
     }
 
@@ -61,13 +62,13 @@ public class DiscordService {
      * @param channel The channel the action is being applied to
      * @return The list of allowed channel actions
      */
-    public List<TextChannelAction> getPossibleActionsForChannel(Member member, net.dv8tion.jda.api.entities.TextChannel channel) {
+    public List<TextChannelAction> getPossibleActionsForChannel(Member member, TextChannel channel) {
         return Arrays.stream(TextChannelAction.values())
                 .filter(action -> action.isAllowed(member, channel))
                 .toList();
     }
 
-    public void sendMessageInChannel(Member member, net.dv8tion.jda.api.entities.TextChannel channel, String content) {
+    public void sendMessageInChannel(Member member, TextChannel channel, String content) {
 
         boolean mentionsEveryone = EVERYONE.getPattern()
                 .matcher(content)

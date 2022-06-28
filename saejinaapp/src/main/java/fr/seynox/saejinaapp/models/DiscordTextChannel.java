@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TextChannel {
+public class DiscordTextChannel {
 
     private Long id;
     private String name;

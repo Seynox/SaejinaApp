@@ -2,11 +2,12 @@ package fr.seynox.saejinaapp.controllers;
 
 import fr.seynox.saejinaapp.exceptions.ResourceNotAccessibleException;
 import fr.seynox.saejinaapp.models.Server;
-import fr.seynox.saejinaapp.models.TextChannel;
+import fr.seynox.saejinaapp.models.DiscordTextChannel;
 import fr.seynox.saejinaapp.models.TextChannelAction;
 import fr.seynox.saejinaapp.services.MemberAccessService;
 import fr.seynox.saejinaapp.services.DiscordService;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
@@ -49,7 +50,7 @@ public class SelectionController {
      * @param serverId The server selected
      * @param principal The logged-in user
      * @throws ResourceNotAccessibleException When the resource is not accessible by the user/bot.
-     * Handled by {@link ExceptionController#showResourceNotAccessible(Exception, Model)}
+     * Handled by {@link ExceptionController#showSaejinaAppException(Exception, Model)}
      * @return The path to the Thymeleaf template
      */
     @GetMapping("/{serverId}")
@@ -57,9 +58,9 @@ public class SelectionController {
         String userId = principal.getName();
 
         Member member = accessService.getServerMember(userId, serverId);
-        List<TextChannel> textChannels = service.getVisibleServerTextChannels(member);
+        List<DiscordTextChannel> discordTextChannels = service.getVisibleServerTextChannels(member);
 
-        model.addAttribute("channels", textChannels);
+        model.addAttribute("channels", discordTextChannels);
         model.addAttribute("serverId", serverId);
 
         return "/selection/channels";
@@ -72,7 +73,7 @@ public class SelectionController {
      * @param channelId The channel selected
      * @param principal The logged-in user
      * @throws ResourceNotAccessibleException When the resource is not accessible by the user/bot.
-     * Handled by {@link ExceptionController#showResourceNotAccessible(Exception, Model)}
+     * Handled by {@link ExceptionController#showSaejinaAppException(Exception, Model)}}
      * @return The path to the Thymeleaf template
      */
     @GetMapping("/{serverId}/{channelId}")
@@ -80,7 +81,7 @@ public class SelectionController {
         String userId = principal.getName();
 
         Member member = accessService.getServerMember(userId, serverId);
-        net.dv8tion.jda.api.entities.TextChannel channel = accessService.getServerTextChannel(member, channelId);
+        TextChannel channel = accessService.getServerTextChannel(member, channelId);
 
         List<TextChannelAction> actions = service.getPossibleActionsForChannel(member, channel);
         model.addAttribute("actions", actions);

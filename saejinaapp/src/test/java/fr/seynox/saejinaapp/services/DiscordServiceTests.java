@@ -2,11 +2,12 @@ package fr.seynox.saejinaapp.services;
 
 import fr.seynox.saejinaapp.exceptions.PermissionException;
 import fr.seynox.saejinaapp.models.Server;
-import fr.seynox.saejinaapp.models.TextChannel;
+import fr.seynox.saejinaapp.models.DiscordTextChannel;
 import fr.seynox.saejinaapp.models.TextChannelAction;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
@@ -90,17 +91,17 @@ class DiscordServiceTests {
         GuildImpl guild = Mockito.mock(GuildImpl.class);
         Member member = Mockito.mock(Member.class);
 
-        List<net.dv8tion.jda.api.entities.TextChannel> channels = List.of(
+        List<TextChannel> channels = List.of(
                 new TextChannelImpl(1L, guild).setName("Channel One"),
                 new TextChannelImpl(2L, guild).setName("Channel Two")
         );
 
-        List<TextChannel> expected = List.of(
-                new TextChannel(1L, "Channel One"),
-                new TextChannel(2L, "Channel Two")
+        List<DiscordTextChannel> expected = List.of(
+                new DiscordTextChannel(1L, "Channel One"),
+                new DiscordTextChannel(2L, "Channel Two")
         );
 
-        List<TextChannel> result;
+        List<DiscordTextChannel> result;
 
         when(member.getGuild()).thenReturn(guild);
         when(guild.getTextChannels()).thenReturn(channels);
@@ -121,7 +122,7 @@ class DiscordServiceTests {
         GuildImpl guild = Mockito.mock(GuildImpl.class);
         Member member = Mockito.mock(Member.class);
 
-        List<TextChannel> result;
+        List<DiscordTextChannel> result;
 
         when(member.getGuild()).thenReturn(guild);
         when(guild.getTextChannels()).thenReturn(List.of());
@@ -143,14 +144,14 @@ class DiscordServiceTests {
         TextChannelImpl visibleChannel = new TextChannelImpl(1L, guild).setName("Channel One");
         TextChannelImpl invisibleChannel = new TextChannelImpl(2L, guild).setName("Invisible Channel");
 
-        List<net.dv8tion.jda.api.entities.TextChannel> channels = List.of(
+        List<TextChannel> channels = List.of(
                 visibleChannel,
                 invisibleChannel
         );
 
-        List<TextChannel> expected = List.of(new TextChannel(1L, "Channel One"));
+        List<DiscordTextChannel> expected = List.of(new DiscordTextChannel(1L, "Channel One"));
 
-        List<TextChannel> result;
+        List<DiscordTextChannel> result;
 
         when(member.getGuild()).thenReturn(guild);
         when(guild.getTextChannels()).thenReturn(channels);
@@ -169,7 +170,7 @@ class DiscordServiceTests {
     void getPossibleActionsForChannelTest() {
         // GIVEN
         Member member = Mockito.mock(Member.class);
-        net.dv8tion.jda.api.entities.TextChannel channel = Mockito.mock(net.dv8tion.jda.api.entities.TextChannel.class);
+        TextChannel channel = Mockito.mock(TextChannel.class);
 
         List<TextChannelAction> expected = Arrays.stream(TextChannelAction.values())
                 .filter(action -> !action.getId().equals(TextChannelAction.SET_TICKET_CHANNEL.getId()))
@@ -192,7 +193,7 @@ class DiscordServiceTests {
         String message = "Hello world";
 
         Member member = Mockito.mock(Member.class);
-        net.dv8tion.jda.api.entities.TextChannel channel = Mockito.mock(net.dv8tion.jda.api.entities.TextChannel.class);
+        TextChannel channel = Mockito.mock(TextChannel.class);
         MessageAction action = Mockito.mock(MessageAction.class);
 
         when(channel.sendMessage(message)).thenReturn(action);
@@ -211,7 +212,7 @@ class DiscordServiceTests {
         String message = "Hello @everyone !";
 
         Member member = Mockito.mock(Member.class);
-        net.dv8tion.jda.api.entities.TextChannel channel = Mockito.mock(net.dv8tion.jda.api.entities.TextChannel.class);
+        TextChannel channel = Mockito.mock(TextChannel.class);
         MessageAction action = Mockito.mock(MessageAction.class);
 
         when(channel.sendMessage(message)).thenReturn(action);
@@ -231,7 +232,7 @@ class DiscordServiceTests {
         String message = "Hello @everyone !";
 
         Member member = Mockito.mock(Member.class);
-        net.dv8tion.jda.api.entities.TextChannel channel = Mockito.mock(net.dv8tion.jda.api.entities.TextChannel.class);
+        TextChannel channel = Mockito.mock(TextChannel.class);
         MessageAction action = Mockito.mock(MessageAction.class);
 
         when(channel.sendMessage(message)).thenReturn(action);
@@ -253,7 +254,7 @@ class DiscordServiceTests {
         String message = "Hello @here !";
 
         Member member = Mockito.mock(Member.class);
-        net.dv8tion.jda.api.entities.TextChannel channel = Mockito.mock(net.dv8tion.jda.api.entities.TextChannel.class);
+        TextChannel channel = Mockito.mock(TextChannel.class);
         MessageAction action = Mockito.mock(MessageAction.class);
 
         when(channel.sendMessage(message)).thenReturn(action);
