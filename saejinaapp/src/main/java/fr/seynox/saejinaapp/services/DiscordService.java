@@ -68,6 +68,14 @@ public class DiscordService {
                 .toList();
     }
 
+    /**
+     * Send a message in the given channel.
+     * WARNING ! This method does not check if the channel is writable for the bot/user, nor the length of the message
+     * @param member The member sending the message
+     * @param channel The channel to send the message to
+     * @param content The content of the message
+     * @throws PermissionException If the member is trying to send an @everyone without the required permission
+     */
     public void sendMessageInChannel(Member member, TextChannel channel, String content) {
 
         boolean mentionsEveryone = EVERYONE.getPattern()
