@@ -4,16 +4,16 @@
       lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Action Selection</title>
+    <title th:text="${pageTitle}"></title>
 </head>
 <body>
     <div>
         Logged in as user: <b th:inline="text"> [[${#httpServletRequest.remoteUser}]] </b>
     </div>
-    <h1>Select an action :</h1>
+    <h1 th:text="${title}"></h1>
     <div>
-        <div th:each="action : ${actions}">
-            <a th:href="@{{actionId}/(actionId=${action.getId()})}" th:text="${action.getName()}"></a>
+        <div class="selectable" th:each="selectable : ${selectableList}">
+            <a th:href="@{{id}/(id=${selectable.getId()})}" th:text="${selectable.getName()}"></a>
         </div>
     </div>
 </body>

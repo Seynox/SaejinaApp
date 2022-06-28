@@ -7,10 +7,15 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Server {
+public class Server implements Selectable {
 
     private String name;
     private String iconUrl;
     private Long id;
+
+    @Override
+    public String getId() {
+        return String.valueOf(id);
+    }
 
 }

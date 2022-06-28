@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 
-public enum TextChannelAction {
+public enum TextChannelAction implements Selectable {
 
     SET_TICKET_CHANNEL("Set as ticket channel", (member, channel) -> member.hasPermission(Permission.MANAGE_SERVER)),
     SEND_MESSAGE("Send message", (member, channel) -> channel.canTalk(member));
@@ -16,10 +16,12 @@ public enum TextChannelAction {
         this.validation = validation;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getId() {
         return this.toString().toLowerCase();
     }

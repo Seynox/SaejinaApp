@@ -7,9 +7,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DiscordTextChannel {
+public class DiscordTextChannel implements Selectable {
 
     private Long id;
     private String name;
 
+    @Override
+    public String getId() {
+        return String.valueOf(id);
+    }
 }

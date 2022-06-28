@@ -54,7 +54,7 @@ class SelectionControllerTests {
         // WHEN
         mockMvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("serverList", serverList));
+                .andExpect(model().attribute("selectableList", serverList));
 
         // THEN
         verify(service, times(1)).getUserServers(userId);
@@ -96,7 +96,7 @@ class SelectionControllerTests {
         // WHEN
         mockMvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("channels", channels));
+                .andExpect(model().attribute("selectableList", channels));
 
         // THEN
         verify(accessService, times(1)).getServerMember(userId, serverId);
@@ -164,8 +164,8 @@ class SelectionControllerTests {
         // WHEN
         mockMvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(view().name("/selection/actions"))
-                .andExpect(model().attribute("actions", actions));
+                .andExpect(view().name("/selection/select"))
+                .andExpect(model().attribute("selectableList", actions));
 
         // THEN
         verify(accessService, times(1)).getServerMember(userId, serverId);

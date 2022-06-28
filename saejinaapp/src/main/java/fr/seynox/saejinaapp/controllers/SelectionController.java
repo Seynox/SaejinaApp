@@ -20,6 +20,8 @@ import java.util.List;
 @Controller
 public class SelectionController {
 
+    private static final String SELECTION_TEMPLATE = "/selection/select";
+
     private final DiscordService service;
     private final MemberAccessService accessService;
 
@@ -40,8 +42,11 @@ public class SelectionController {
         String userId = principal.getName();
         List<Server> serverList = service.getUserServers(userId);
 
-        model.addAttribute("serverList", serverList);
-        return "/selection/servers";
+        model.addAttribute("selectableList", serverList);
+        model.addAttribute("pageTitle", "Server Selection");
+        model.addAttribute("title", "Select a server :");
+
+        return SELECTION_TEMPLATE;
     }
 
     /**
@@ -60,9 +65,11 @@ public class SelectionController {
         Member member = accessService.getServerMember(userId, serverId);
         List<DiscordTextChannel> discordTextChannels = service.getVisibleServerTextChannels(member);
 
-        model.addAttribute("channels", discordTextChannels);
+        model.addAttribute("selectableList", discordTextChannels);
+        model.addAttribute("pageTitle", "Channel Selection");
+        model.addAttribute("title", "Select a channel :");
 
-        return "/selection/channels";
+        return SELECTION_TEMPLATE;
     }
 
     /**
@@ -83,9 +90,12 @@ public class SelectionController {
         TextChannel channel = accessService.getServerTextChannel(member, channelId);
 
         List<TextChannelAction> actions = service.getPossibleActionsForChannel(member, channel);
-        model.addAttribute("actions", actions);
 
-        return "/selection/actions";
+        model.addAttribute("selectableList", actions);
+        model.addAttribute("pageTitle", "Action Selection");
+        model.addAttribute("title", "Select an action :");
+
+        return SELECTION_TEMPLATE;
     }
 
 }
