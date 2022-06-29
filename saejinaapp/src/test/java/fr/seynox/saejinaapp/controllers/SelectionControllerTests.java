@@ -92,7 +92,7 @@ class SelectionControllerTests {
         Member member = Mockito.mock(Member.class);
 
         when(accessService.getServerMember(userId, serverId)).thenReturn(member);
-        when(service.getVisibleServerTextChannels(member)).thenReturn(channels);
+        when(accessService.getServerTextChannels(member)).thenReturn(channels);
         // WHEN
         mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -100,7 +100,7 @@ class SelectionControllerTests {
 
         // THEN
         verify(accessService).getServerMember(userId, serverId);
-        verify(service).getVisibleServerTextChannels(member);
+        verify(accessService).getServerTextChannels(member);
     }
 
     @Test
@@ -121,7 +121,7 @@ class SelectionControllerTests {
 
         // THEN
         verify(accessService).getServerMember(userId, serverId);
-        verify(service, never()).getVisibleServerTextChannels(any());
+        verify(accessService, never()).getServerTextChannels(any());
     }
 
     @Test
@@ -138,7 +138,7 @@ class SelectionControllerTests {
 
         // THEN
         verify(accessService, never()).getServerMember(any(), any());
-        verify(service, never()).getVisibleServerTextChannels(any());
+        verify(accessService, never()).getServerTextChannels(any());
     }
 
     @Test

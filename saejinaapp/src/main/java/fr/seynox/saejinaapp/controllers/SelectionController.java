@@ -66,7 +66,7 @@ public class SelectionController {
         String userId = principal.getName();
 
         Member member = accessService.getServerMember(userId, serverId);
-        List<DiscordTextChannel> discordTextChannels = service.getVisibleServerTextChannels(member);
+        List<DiscordTextChannel> discordTextChannels = accessService.getServerTextChannels(member);
 
         model.addAttribute(SELECTABLE_LIST_ATTRIBUTE, discordTextChannels);
         model.addAttribute(PAGE_TITLE_ATTRIBUTE, "Channel Selection");

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class ResourceNotAccessibleException extends SaejinaAppException {
 
-    private static final String DEFAULT_MESSAGE = "The resource does not exist, or is not accessible for the user";
+    private static final String DEFAULT_MESSAGE = "The resource does not exist, or is not accessible to the bot/user";
 
     public ResourceNotAccessibleException() {
         this(DEFAULT_MESSAGE);

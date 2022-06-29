@@ -2,17 +2,16 @@ package fr.seynox.saejinaapp.services;
 
 import fr.seynox.saejinaapp.exceptions.PermissionException;
 import fr.seynox.saejinaapp.models.Server;
-import fr.seynox.saejinaapp.models.DiscordTextChannel;
 import fr.seynox.saejinaapp.models.TextChannelAction;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.dv8tion.jda.internal.JDAImpl;
 import net.dv8tion.jda.internal.entities.GuildImpl;
-import net.dv8tion.jda.internal.entities.TextChannelImpl;
 import net.dv8tion.jda.internal.requests.CompletedRestAction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -88,84 +87,6 @@ class DiscordServiceTests {
         // THEN
         verify(jda).retrieveUserById(userId);
         assertThat(result).isEmpty();
-    }
-
-    @Test
-    void getVisibleServerTextChannelsTest() {
-        // GIVEN
-        GuildImpl guild = Mockito.mock(GuildImpl.class);
-
-        List<TextChannel> channels = List.of(
-                new TextChannelImpl(1L, guild).setName("Channel One"),
-                new TextChannelImpl(2L, guild).setName("Channel Two")
-        );
-
-        List<DiscordTextChannel> expected = List.of(
-                new DiscordTextChannel(1L, "Channel One"),
-                new DiscordTextChannel(2L, "Channel Two")
-        );
-
-        List<DiscordTextChannel> result;
-
-        when(member.getGuild()).thenReturn(guild);
-        when(guild.getTextChannels()).thenReturn(channels);
-        when(member.hasAccess(any())).thenReturn(true);
-        // WHEN
-        result = service.getVisibleServerTextChannels(member);
-
-        // THEN
-        verify(member).getGuild();
-        verify(guild).getTextChannels();
-        verify(member, times(2)).hasAccess(any());
-        assertThat(result).containsExactlyElementsOf(expected);
-    }
-
-    @Test
-    void getVisibleServerTextChannelsWithNoChannelTest() {
-        // GIVEN
-        GuildImpl guild = Mockito.mock(GuildImpl.class);
-
-        List<DiscordTextChannel> result;
-
-        when(member.getGuild()).thenReturn(guild);
-        when(guild.getTextChannels()).thenReturn(List.of());
-        // WHEN
-        result = service.getVisibleServerTextChannels(member);
-
-        // THEN
-        verify(member).getGuild();
-        verify(guild).getTextChannels();
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    void filterInvisibleChannelsTest() {
-        // GIVEN
-        GuildImpl guild = Mockito.mock(GuildImpl.class);
-
-        TextChannelImpl visibleChannel = new TextChannelImpl(1L, guild).setName("Channel One");
-        TextChannelImpl invisibleChannel = new TextChannelImpl(2L, guild).setName("Invisible Channel");
-
-        List<TextChannel> channels = List.of(
-                visibleChannel,
-                invisibleChannel
-        );
-
-        List<DiscordTextChannel> expected = List.of(new DiscordTextChannel(1L, "Channel One"));
-
-        List<DiscordTextChannel> result;
-
-        when(member.getGuild()).thenReturn(guild);
-        when(guild.getTextChannels()).thenReturn(channels);
-        when(member.hasAccess(invisibleChannel)).thenReturn(false);
-        when(member.hasAccess(visibleChannel)).thenReturn(true);
-        // WHEN
-        result = service.getVisibleServerTextChannels(member);
-
-        // THEN
-        verify(member).getGuild();
-        verify(guild).getTextChannels();
-        assertThat(result).containsExactlyElementsOf(expected);
     }
 
     @Test
@@ -260,40 +181,6 @@ class DiscordServiceTests {
         verify(member).hasPermission(Permission.MESSAGE_MENTION_EVERYONE);
         verify(channel, never()).sendMessage(any(String.class));
         verify(action, never()).queue();
-    }
-
-    @Test
-    void sendTicketButtonInChannelTest() {
-        // GIVEN
-        String label = "My Button !";
-        Button expectedButton = Button.of(ButtonStyle.SECONDARY, "ticket-creation", label, Emoji.fromUnicode("U+1F39F"));
-        MessageAction action = Mockito.mock(MessageAction.class);
-
-        when(member.hasPermission(Permission.MANAGE_SERVER)).thenReturn(true);
-        when(channel.sendMessage("⌄")).thenReturn(action);
-        when(action.setActionRow(expectedButton)).thenReturn(action);
-        // WHEN
-        service.sendTicketButtonInChannel(member, channel, label);
-
-        // THEN
-        verify(member).hasPermission(Permission.MANAGE_SERVER);
-        verify(channel).sendMessage("⌄");
-        verify(action).setActionRow(expectedButton);
-        verify(action).queue();
-    }
-
-    @Test
-    void refuseUnauthorizedTicketButtonInChannelTest() {
-        // GIVEN
-        String label = "My Button !";
-
-        when(member.hasPermission(Permission.MANAGE_SERVER)).thenReturn(false);
-        // WHEN
-        assertThatExceptionOfType(PermissionException.class)
-                .isThrownBy(() -> service.sendTicketButtonInChannel(member, channel, label));
-
-        // THEN
-        verify(channel, never()).sendMessage(any(String.class));
     }
 
 }

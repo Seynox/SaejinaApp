@@ -2,6 +2,7 @@ package fr.seynox.saejinaapp.controllers;
 
 import fr.seynox.saejinaapp.services.DiscordService;
 import fr.seynox.saejinaapp.services.MemberAccessService;
+import fr.seynox.saejinaapp.services.TicketService;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +34,9 @@ class ActionControllerTests {
 
     @MockBean
     private DiscordService service;
+
+    @MockBean
+    private TicketService ticketService;
 
     @MockBean
     private MemberAccessService accessService;
@@ -289,7 +293,7 @@ class ActionControllerTests {
         // THEN
         verify(accessService).getServerMember(userId, serverId);
         verify(accessService).getWritableServerTextChannel(member, channelId);
-        verify(service).sendTicketButtonInChannel(member, channel, content);
+        verify(ticketService).sendTicketButtonInChannel(member, channel, content);
     }
 
     @Test
@@ -319,7 +323,7 @@ class ActionControllerTests {
         // THEN
         verify(accessService).getServerMember(userId, serverId);
         verify(accessService).getWritableServerTextChannel(member, channelId);
-        verify(service, never()).sendTicketButtonInChannel(any(), any(), any());
+        verify(ticketService, never()).sendTicketButtonInChannel(any(), any(), any());
     }
 
     @Test
@@ -349,7 +353,7 @@ class ActionControllerTests {
         // THEN
         verify(accessService).getServerMember(userId, serverId);
         verify(accessService).getWritableServerTextChannel(member, channelId);
-        verify(service, never()).sendTicketButtonInChannel(any(), any(), any());
+        verify(ticketService, never()).sendTicketButtonInChannel(any(), any(), any());
     }
 
 }

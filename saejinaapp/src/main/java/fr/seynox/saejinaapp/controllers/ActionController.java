@@ -4,6 +4,7 @@ import fr.seynox.saejinaapp.exceptions.ResourceNotAccessibleException;
 import fr.seynox.saejinaapp.models.StringRequest;
 import fr.seynox.saejinaapp.services.DiscordService;
 import fr.seynox.saejinaapp.services.MemberAccessService;
+import fr.seynox.saejinaapp.services.TicketService;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -26,10 +27,12 @@ public class ActionController {
 
     private final MemberAccessService accessService;
     private final DiscordService service;
+    private final TicketService ticketService;
 
-    public ActionController(MemberAccessService accessService, DiscordService service) {
+    public ActionController(MemberAccessService accessService, DiscordService service, TicketService ticketService) {
         this.accessService = accessService;
         this.service = service;
+        this.ticketService = ticketService;
     }
 
     /**
@@ -106,7 +109,7 @@ public class ActionController {
             return "/action/ticket_button";
         }
 
-        service.sendTicketButtonInChannel(member, channel, buttonLabel.getContent());
+        ticketService.sendTicketButtonInChannel(member, channel, buttonLabel.getContent());
 
         return "redirect:?success";
     }

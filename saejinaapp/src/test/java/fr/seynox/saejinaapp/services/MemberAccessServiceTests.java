@@ -2,15 +2,19 @@ package fr.seynox.saejinaapp.services;
 
 import fr.seynox.saejinaapp.exceptions.PermissionException;
 import fr.seynox.saejinaapp.exceptions.ResourceNotAccessibleException;
+import fr.seynox.saejinaapp.models.DiscordTextChannel;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.internal.requests.CompletedRestAction;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.Mockito.*;
 
@@ -19,10 +23,16 @@ class MemberAccessServiceTests {
     private JDA jda;
     private MemberAccessService service;
 
+    private Member member;
+    private Guild guild;
+
     @BeforeEach
     void initTest() {
-        this.jda = Mockito.mock(JDA.class);
-        this.service = new MemberAccessService(jda);
+        jda = Mockito.mock(JDA.class);
+        service = new MemberAccessService(jda);
+
+        member = Mockito.mock(Member.class);
+        guild = Mockito.mock(Guild.class);
     }
 
     @Test
@@ -31,11 +41,11 @@ class MemberAccessServiceTests {
         String userId = "123456";
         long serverId = 6543214;
 
-        Guild guild = Mockito.mock(Guild.class);
-        Member member = Mockito.mock(Member.class);
+        RestAction<Member> action = Mockito.mock(RestAction.class);
 
         when(jda.getGuildById(serverId)).thenReturn(guild);
-        when(guild.retrieveMemberById(userId)).thenReturn(new CompletedRestAction<>(null, member));
+        when(guild.retrieveMemberById(userId)).thenReturn(action);
+        when(action.complete()).thenReturn(member);
         // WHEN
         service.getServerMember(userId, serverId);
 
@@ -65,10 +75,11 @@ class MemberAccessServiceTests {
         String userId = "123456";
         long serverId = 6543214;
 
-        Guild guild = Mockito.mock(Guild.class);
+        RestAction<Member> action = Mockito.mock(RestAction.class);
 
         when(jda.getGuildById(serverId)).thenReturn(guild);
-        when(guild.retrieveMemberById(userId)).thenReturn(new CompletedRestAction<>(null, null));
+        when(guild.retrieveMemberById(userId)).thenReturn(action);
+        when(action.complete()).thenReturn(null);
         // WHEN
         assertThatExceptionOfType(ResourceNotAccessibleException.class)
                 .isThrownBy(() -> service.getServerMember(userId, serverId));
@@ -83,8 +94,6 @@ class MemberAccessServiceTests {
         // GIVEN
         long channelId = 123456;
 
-        Member member = Mockito.mock(Member.class);
-        Guild guild = Mockito.mock(Guild.class);
         TextChannel channel = Mockito.mock(TextChannel.class);
 
         when(member.getGuild()).thenReturn(guild);
@@ -104,8 +113,6 @@ class MemberAccessServiceTests {
         // GIVEN
         long channelId = 123456;
 
-        Member member = Mockito.mock(Member.class);
-        Guild guild = Mockito.mock(Guild.class);
         TextChannel channel = Mockito.mock(TextChannel.class);
 
         when(member.getGuild()).thenReturn(guild);
@@ -126,9 +133,6 @@ class MemberAccessServiceTests {
         // GIVEN
         long channelId = 123456;
 
-        Member member = Mockito.mock(Member.class);
-        Guild guild = Mockito.mock(Guild.class);
-
         when(member.getGuild()).thenReturn(guild);
         when(guild.getTextChannelById(channelId)).thenReturn(null);
         // WHEN
@@ -142,12 +146,89 @@ class MemberAccessServiceTests {
     }
 
     @Test
+    void getVisibleServerTextChannelsTest() {
+        // GIVEN
+        TextChannel channelOne = Mockito.mock(TextChannel.class);
+        TextChannel channelTwo = Mockito.mock(TextChannel.class);
+
+        List<TextChannel> channels = List.of(channelOne, channelTwo);
+
+        List<DiscordTextChannel> expected = List.of(
+                new DiscordTextChannel(1L, "Channel One"),
+                new DiscordTextChannel(2L, "Channel Two")
+        );
+
+        List<DiscordTextChannel> result;
+
+        when(channelOne.getName()).thenReturn("Channel One");
+        when(channelOne.getIdLong()).thenReturn(1L);
+        when(channelTwo.getName()).thenReturn("Channel Two");
+        when(channelTwo.getIdLong()).thenReturn(2L);
+
+        when(member.getGuild()).thenReturn(guild);
+        when(guild.getTextChannels()).thenReturn(channels);
+        when(member.hasAccess(any())).thenReturn(true);
+        // WHEN
+        result = service.getServerTextChannels(member);
+
+        // THEN
+        verify(member).getGuild();
+        verify(guild).getTextChannels();
+        verify(member, times(2)).hasAccess(any());
+        assertThat(result).containsExactlyElementsOf(expected);
+    }
+
+    @Test
+    void getVisibleServerTextChannelsWithNoChannelTest() {
+        // GIVEN
+        List<DiscordTextChannel> result;
+
+        when(member.getGuild()).thenReturn(guild);
+        when(guild.getTextChannels()).thenReturn(List.of());
+        // WHEN
+        result = service.getServerTextChannels(member);
+
+        // THEN
+        verify(member).getGuild();
+        verify(guild).getTextChannels();
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void filterInvisibleChannelsTest() {
+        // GIVEN
+        TextChannel visibleChannel = Mockito.mock(TextChannel.class);
+        TextChannel invisibleChannel = Mockito.mock(TextChannel.class);
+
+        List<TextChannel> channels = List.of(visibleChannel, invisibleChannel);
+
+        List<DiscordTextChannel> expected = List.of(new DiscordTextChannel(1L, "Channel One"));
+
+        List<DiscordTextChannel> result;
+
+        when(visibleChannel.getName()).thenReturn("Channel One");
+        when(visibleChannel.getIdLong()).thenReturn(1L);
+        when(invisibleChannel.getName()).thenReturn("Invisible Channel");
+        when(invisibleChannel.getIdLong()).thenReturn(2L);
+
+        when(member.getGuild()).thenReturn(guild);
+        when(guild.getTextChannels()).thenReturn(channels);
+        when(member.hasAccess(invisibleChannel)).thenReturn(false);
+        when(member.hasAccess(visibleChannel)).thenReturn(true);
+        // WHEN
+        result = service.getServerTextChannels(member);
+
+        // THEN
+        verify(member).getGuild();
+        verify(guild).getTextChannels();
+        assertThat(result).containsExactlyElementsOf(expected);
+    }
+
+    @Test
     void getWritableServerTextChannelTest() {
         // GIVEN
         long channelId = 123456;
 
-        Member member = Mockito.mock(Member.class);
-        Guild guild = Mockito.mock(Guild.class);
         TextChannel channel = Mockito.mock(TextChannel.class);
 
         when(member.getGuild()).thenReturn(guild);
@@ -171,8 +252,6 @@ class MemberAccessServiceTests {
         // GIVEN
         long channelId = 123456;
 
-        Member member = Mockito.mock(Member.class);
-        Guild guild = Mockito.mock(Guild.class);
         TextChannel channel = Mockito.mock(TextChannel.class);
 
         when(member.getGuild()).thenReturn(guild);
@@ -197,8 +276,6 @@ class MemberAccessServiceTests {
         // GIVEN
         long channelId = 123456;
 
-        Member member = Mockito.mock(Member.class);
-        Guild guild = Mockito.mock(Guild.class);
         TextChannel channel = Mockito.mock(TextChannel.class);
 
         when(member.getGuild()).thenReturn(guild);
