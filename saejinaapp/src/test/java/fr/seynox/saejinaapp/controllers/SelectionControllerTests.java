@@ -57,7 +57,7 @@ class SelectionControllerTests {
                 .andExpect(model().attribute("selectableList", serverList));
 
         // THEN
-        verify(service, times(1)).getUserServers(userId);
+        verify(service).getUserServers(userId);
     }
 
     @Test
@@ -99,8 +99,8 @@ class SelectionControllerTests {
                 .andExpect(model().attribute("selectableList", channels));
 
         // THEN
-        verify(accessService, times(1)).getServerMember(userId, serverId);
-        verify(service, times(1)).getVisibleServerTextChannels(member);
+        verify(accessService).getServerMember(userId, serverId);
+        verify(service).getVisibleServerTextChannels(member);
     }
 
     @Test
@@ -120,7 +120,7 @@ class SelectionControllerTests {
                 .andExpect(view().name("/exception/error"));
 
         // THEN
-        verify(accessService, times(1)).getServerMember(userId, serverId);
+        verify(accessService).getServerMember(userId, serverId);
         verify(service, never()).getVisibleServerTextChannels(any());
     }
 
@@ -168,9 +168,9 @@ class SelectionControllerTests {
                 .andExpect(model().attribute("selectableList", actions));
 
         // THEN
-        verify(accessService, times(1)).getServerMember(userId, serverId);
-        verify(accessService, times(1)).getServerTextChannel(member, channelId);
-        verify(service, times(1)).getPossibleActionsForChannel(member, channel);
+        verify(accessService).getServerMember(userId, serverId);
+        verify(accessService).getServerTextChannel(member, channelId);
+        verify(service).getPossibleActionsForChannel(member, channel);
     }
 
     @Test

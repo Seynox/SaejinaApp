@@ -40,8 +40,8 @@ class MemberAccessServiceTests {
         service.getServerMember(userId, serverId);
 
         // THEN
-        verify(jda, times(1)).getGuildById(serverId);
-        verify(guild, times(1)).retrieveMemberById(userId);
+        verify(jda).getGuildById(serverId);
+        verify(guild).retrieveMemberById(userId);
     }
 
     @Test
@@ -56,7 +56,7 @@ class MemberAccessServiceTests {
                 .isThrownBy(() -> service.getServerMember(userId, serverId));
 
         // THEN
-        verify(jda, times(1)).getGuildById(serverId);
+        verify(jda).getGuildById(serverId);
     }
 
     @Test
@@ -74,8 +74,8 @@ class MemberAccessServiceTests {
                 .isThrownBy(() -> service.getServerMember(userId, serverId));
 
         // THEN
-        verify(jda, times(1)).getGuildById(serverId);
-        verify(guild, times(1)).retrieveMemberById(userId);
+        verify(jda).getGuildById(serverId);
+        verify(guild).retrieveMemberById(userId);
     }
 
     @Test
@@ -94,9 +94,9 @@ class MemberAccessServiceTests {
         service.getServerTextChannel(member, channelId);
 
         // THEN
-        verify(member, times(1)).getGuild();
-        verify(member, times(1)).hasAccess(channel);
-        verify(guild, times(1)).getTextChannelById(channelId);
+        verify(member).getGuild();
+        verify(member).hasAccess(channel);
+        verify(guild).getTextChannelById(channelId);
     }
 
     @Test
@@ -116,9 +116,9 @@ class MemberAccessServiceTests {
                 .isThrownBy(() -> service.getServerTextChannel(member, channelId));
 
         // THEN
-        verify(member, times(1)).getGuild();
-        verify(member, times(1)).hasAccess(channel);
-        verify(guild, times(1)).getTextChannelById(channelId);
+        verify(member).getGuild();
+        verify(member).hasAccess(channel);
+        verify(guild).getTextChannelById(channelId);
     }
 
     @Test
@@ -136,9 +136,9 @@ class MemberAccessServiceTests {
                 .isThrownBy(() -> service.getServerTextChannel(member, channelId));
 
         // THEN
-        verify(member, times(1)).getGuild();
+        verify(member).getGuild();
         verify(member, never()).hasAccess(any());
-        verify(guild, times(1)).getTextChannelById(channelId);
+        verify(guild).getTextChannelById(channelId);
     }
 
     @Test
@@ -159,11 +159,11 @@ class MemberAccessServiceTests {
         service.getWritableServerTextChannel(member, channelId);
 
         // THEN
-        verify(member, times(1)).getGuild();
-        verify(member, times(1)).hasAccess(channel);
-        verify(guild, times(1)).getTextChannelById(channelId);
-        verify(channel, times(1)).canTalk(member);
-        verify(channel, times(1)).canTalk();
+        verify(member).getGuild();
+        verify(member).hasAccess(channel);
+        verify(guild).getTextChannelById(channelId);
+        verify(channel).canTalk(member);
+        verify(channel).canTalk();
     }
 
     @Test
@@ -185,10 +185,10 @@ class MemberAccessServiceTests {
                 .withMessage("You do not have the permission to talk in this channel");
 
         // THEN
-        verify(member, times(1)).getGuild();
-        verify(member, times(1)).hasAccess(channel);
-        verify(guild, times(1)).getTextChannelById(channelId);
-        verify(channel, times(1)).canTalk(member);
+        verify(member).getGuild();
+        verify(member).hasAccess(channel);
+        verify(guild).getTextChannelById(channelId);
+        verify(channel).canTalk(member);
         verify(channel, never()).canTalk();
     }
 
@@ -212,11 +212,11 @@ class MemberAccessServiceTests {
                 .withMessage("I do not have the permission to talk in this channel. Please contact the server administrators");
 
         // THEN
-        verify(member, times(1)).getGuild();
-        verify(member, times(1)).hasAccess(channel);
-        verify(guild, times(1)).getTextChannelById(channelId);
-        verify(channel, times(1)).canTalk(member);
-        verify(channel, times(1)).canTalk();
+        verify(member).getGuild();
+        verify(member).hasAccess(channel);
+        verify(guild).getTextChannelById(channelId);
+        verify(channel).canTalk(member);
+        verify(channel).canTalk();
     }
 
 }

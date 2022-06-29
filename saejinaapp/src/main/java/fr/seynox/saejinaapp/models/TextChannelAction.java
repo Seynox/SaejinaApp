@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 
 public enum TextChannelAction implements Selectable {
 
-    SET_TICKET_CHANNEL("Set as ticket channel", (member, channel) -> member.hasPermission(Permission.MANAGE_SERVER)),
+    SEND_TICKET_BUTTON("Send ticket creation button", (member, channel) -> member.hasPermission(Permission.MANAGE_SERVER)),
     SEND_MESSAGE("Send message", (member, channel) -> channel.canTalk(member));
 
     private final String name;

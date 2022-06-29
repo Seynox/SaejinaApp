@@ -5,10 +5,9 @@ import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.DiscordTextChannel;
 import fr.seynox.saejinaapp.models.TextChannelAction;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.dv8tion.jda.internal.JDAImpl;
@@ -31,10 +30,16 @@ class DiscordServiceTests {
     private JDAImpl jda;
     private DiscordService service;
 
+    private Member member;
+    private TextChannel channel;
+
     @BeforeEach
     void initTest() {
         jda = Mockito.mock(JDAImpl.class);
         service = new DiscordService(jda);
+
+        member = Mockito.mock(Member.class);
+        channel = Mockito.mock(TextChannel.class);
 
         when(jda.getCacheFlags()).thenReturn(CacheFlag.getPrivileged());
     }
@@ -64,8 +69,8 @@ class DiscordServiceTests {
         result = service.getUserServers(userId);
 
         // THEN
-        verify(jda, times(1)).retrieveUserById(userId);
-        verify(user, times(1)).getMutualGuilds();
+        verify(jda).retrieveUserById(userId);
+        verify(user).getMutualGuilds();
         assertThat(result).containsExactlyElementsOf(expected);
     }
 
@@ -81,7 +86,7 @@ class DiscordServiceTests {
         result = service.getUserServers(userId);
 
         // THEN
-        verify(jda, times(1)).retrieveUserById(userId);
+        verify(jda).retrieveUserById(userId);
         assertThat(result).isEmpty();
     }
 
@@ -89,7 +94,6 @@ class DiscordServiceTests {
     void getVisibleServerTextChannelsTest() {
         // GIVEN
         GuildImpl guild = Mockito.mock(GuildImpl.class);
-        Member member = Mockito.mock(Member.class);
 
         List<TextChannel> channels = List.of(
                 new TextChannelImpl(1L, guild).setName("Channel One"),
@@ -110,8 +114,8 @@ class DiscordServiceTests {
         result = service.getVisibleServerTextChannels(member);
 
         // THEN
-        verify(member, times(1)).getGuild();
-        verify(guild, times(1)).getTextChannels();
+        verify(member).getGuild();
+        verify(guild).getTextChannels();
         verify(member, times(2)).hasAccess(any());
         assertThat(result).containsExactlyElementsOf(expected);
     }
@@ -120,7 +124,6 @@ class DiscordServiceTests {
     void getVisibleServerTextChannelsWithNoChannelTest() {
         // GIVEN
         GuildImpl guild = Mockito.mock(GuildImpl.class);
-        Member member = Mockito.mock(Member.class);
 
         List<DiscordTextChannel> result;
 
@@ -130,8 +133,8 @@ class DiscordServiceTests {
         result = service.getVisibleServerTextChannels(member);
 
         // THEN
-        verify(member, times(1)).getGuild();
-        verify(guild, times(1)).getTextChannels();
+        verify(member).getGuild();
+        verify(guild).getTextChannels();
         assertThat(result).isEmpty();
     }
 
@@ -139,7 +142,6 @@ class DiscordServiceTests {
     void filterInvisibleChannelsTest() {
         // GIVEN
         GuildImpl guild = Mockito.mock(GuildImpl.class);
-        Member member = Mockito.mock(Member.class);
 
         TextChannelImpl visibleChannel = new TextChannelImpl(1L, guild).setName("Channel One");
         TextChannelImpl invisibleChannel = new TextChannelImpl(2L, guild).setName("Invisible Channel");
@@ -161,19 +163,17 @@ class DiscordServiceTests {
         result = service.getVisibleServerTextChannels(member);
 
         // THEN
-        verify(member, times(1)).getGuild();
-        verify(guild, times(1)).getTextChannels();
+        verify(member).getGuild();
+        verify(guild).getTextChannels();
         assertThat(result).containsExactlyElementsOf(expected);
     }
 
     @Test
     void getPossibleActionsForChannelTest() {
         // GIVEN
-        Member member = Mockito.mock(Member.class);
-        TextChannel channel = Mockito.mock(TextChannel.class);
 
         List<TextChannelAction> expected = Arrays.stream(TextChannelAction.values())
-                .filter(action -> !action.getId().equals(TextChannelAction.SET_TICKET_CHANNEL.getId()))
+                .filter(action -> !action.getId().equals(TextChannelAction.SEND_TICKET_BUTTON.getId()))
                 .toList();
 
         List<TextChannelAction> result;
@@ -192,8 +192,6 @@ class DiscordServiceTests {
         // GIVEN
         String message = "Hello world";
 
-        Member member = Mockito.mock(Member.class);
-        TextChannel channel = Mockito.mock(TextChannel.class);
         MessageAction action = Mockito.mock(MessageAction.class);
 
         when(channel.sendMessage(message)).thenReturn(action);
@@ -202,8 +200,8 @@ class DiscordServiceTests {
 
         // THEN
         verify(member, never()).hasPermission(any(Permission.class));
-        verify(channel, times(1)).sendMessage(message);
-        verify(action, times(1)).queue();
+        verify(channel).sendMessage(message);
+        verify(action).queue();
     }
 
     @Test
@@ -211,8 +209,6 @@ class DiscordServiceTests {
         // GIVEN
         String message = "Hello @everyone !";
 
-        Member member = Mockito.mock(Member.class);
-        TextChannel channel = Mockito.mock(TextChannel.class);
         MessageAction action = Mockito.mock(MessageAction.class);
 
         when(channel.sendMessage(message)).thenReturn(action);
@@ -221,9 +217,9 @@ class DiscordServiceTests {
         service.sendMessageInChannel(member, channel, message);
 
         // THEN
-        verify(member, times(1)).hasPermission(Permission.MESSAGE_MENTION_EVERYONE);
-        verify(channel, times(1)).sendMessage(message);
-        verify(action, times(1)).queue();
+        verify(member).hasPermission(Permission.MESSAGE_MENTION_EVERYONE);
+        verify(channel).sendMessage(message);
+        verify(action).queue();
     }
 
     @Test
@@ -231,8 +227,6 @@ class DiscordServiceTests {
         // GIVEN
         String message = "Hello @everyone !";
 
-        Member member = Mockito.mock(Member.class);
-        TextChannel channel = Mockito.mock(TextChannel.class);
         MessageAction action = Mockito.mock(MessageAction.class);
 
         when(channel.sendMessage(message)).thenReturn(action);
@@ -243,7 +237,7 @@ class DiscordServiceTests {
                 .withMessage("You do not have the permission to mention everyone");
 
         // THEN
-        verify(member, times(1)).hasPermission(Permission.MESSAGE_MENTION_EVERYONE);
+        verify(member).hasPermission(Permission.MESSAGE_MENTION_EVERYONE);
         verify(channel, never()).sendMessage(any(String.class));
         verify(action, never()).queue();
     }
@@ -253,8 +247,6 @@ class DiscordServiceTests {
         // GIVEN
         String message = "Hello @here !";
 
-        Member member = Mockito.mock(Member.class);
-        TextChannel channel = Mockito.mock(TextChannel.class);
         MessageAction action = Mockito.mock(MessageAction.class);
 
         when(channel.sendMessage(message)).thenReturn(action);
@@ -265,9 +257,43 @@ class DiscordServiceTests {
                 .withMessage("You do not have the permission to mention everyone");
 
         // THEN
-        verify(member, times(1)).hasPermission(Permission.MESSAGE_MENTION_EVERYONE);
+        verify(member).hasPermission(Permission.MESSAGE_MENTION_EVERYONE);
         verify(channel, never()).sendMessage(any(String.class));
         verify(action, never()).queue();
+    }
+
+    @Test
+    void sendTicketButtonInChannelTest() {
+        // GIVEN
+        String label = "My Button !";
+        Button expectedButton = Button.of(ButtonStyle.SECONDARY, "ticket-creation", label, Emoji.fromUnicode("U+1F39F"));
+        MessageAction action = Mockito.mock(MessageAction.class);
+
+        when(member.hasPermission(Permission.MANAGE_SERVER)).thenReturn(true);
+        when(channel.sendMessage("⌄")).thenReturn(action);
+        when(action.setActionRow(expectedButton)).thenReturn(action);
+        // WHEN
+        service.sendTicketButtonInChannel(member, channel, label);
+
+        // THEN
+        verify(member).hasPermission(Permission.MANAGE_SERVER);
+        verify(channel).sendMessage("⌄");
+        verify(action).setActionRow(expectedButton);
+        verify(action).queue();
+    }
+
+    @Test
+    void refuseUnauthorizedTicketButtonInChannelTest() {
+        // GIVEN
+        String label = "My Button !";
+
+        when(member.hasPermission(Permission.MANAGE_SERVER)).thenReturn(false);
+        // WHEN
+        assertThatExceptionOfType(PermissionException.class)
+                .isThrownBy(() -> service.sendTicketButtonInChannel(member, channel, label));
+
+        // THEN
+        verify(channel, never()).sendMessage(any(String.class));
     }
 
 }
