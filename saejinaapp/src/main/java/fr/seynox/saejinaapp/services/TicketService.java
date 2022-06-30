@@ -27,7 +27,7 @@ public class TicketService {
     public static final String TICKET_INVITE_ID_TEMPLATE =  "ticket-invite#%s";
     public static final String TICKET_CLOSE_ID =  "ticket-close";
     public static final String TICKET_CLOSE_CONFIRM_ID =  "ticket-close-confirm";
-    private static final String TICKETS_CATEGORY_NAME = "\uD83C\uDFAB | Tickets";
+    public static final String TICKETS_CATEGORY_NAME = "\uD83C\uDFAB | Tickets";
 
     /**
      * Send a button used to create tickets
@@ -83,7 +83,7 @@ public class TicketService {
         // Get or create tickets category
         Role everyoneRole = guild.getPublicRole();
 
-        Category ticketsCategory = guild.getCategoriesByName(TICKETS_CATEGORY_NAME, true).stream()
+        Category ticketsCategory = guild.getCategoriesByName(TICKETS_CATEGORY_NAME, false).stream()
                 .findFirst()
                 .orElseGet(() -> guild.createCategory(TICKETS_CATEGORY_NAME)
                         .addPermissionOverride(everyoneRole, List.of(), List.of(Permission.VIEW_CHANNEL))
