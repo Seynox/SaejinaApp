@@ -1,5 +1,6 @@
 package fr.seynox.saejinaapp.configuration;
 
+import fr.seynox.saejinaapp.listeners.TicketEventsListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
@@ -17,10 +18,11 @@ public class JDAConfiguration {
     private String token;
 
     @Bean
-    public JDA getJDA() throws LoginException {
+    public JDA getJDA(TicketEventsListener ticketEventsListener) throws LoginException {
         return JDABuilder.createDefault(token)
                 .enableIntents(GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_MEMBERS)
                 .setEventManager(new AnnotatedEventManager())
+                .addEventListeners(ticketEventsListener)
                 .build();
     }
 
