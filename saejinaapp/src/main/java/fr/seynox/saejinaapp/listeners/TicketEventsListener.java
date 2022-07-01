@@ -29,6 +29,10 @@ public class TicketEventsListener {
         this.service = service;
     }
 
+    /**
+     *  Triggered when a user presses a button.
+     *  Used to handle tickets buttons (Create, Close, Invite)
+     */
     @SubscribeEvent
     public void onButtonPress(ButtonInteractionEvent event) {
 
@@ -71,6 +75,10 @@ public class TicketEventsListener {
         }
     }
 
+    /**
+     * Triggered when a user submits a modal (form).
+     * Used to handle ticket submission
+     */
     @SubscribeEvent
     public void onModalSubmit(ModalInteractionEvent event) {
 
@@ -81,6 +89,9 @@ public class TicketEventsListener {
 
     }
 
+    /**
+     *  Submits a ticket to the server via a modal (form)
+     */
     public void submitTicketToServer(ModalInteractionEvent event) {
         Member member = event.getMember();
         if(member == null) {

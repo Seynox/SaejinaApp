@@ -52,6 +52,12 @@ public class TicketService {
                 .queue();
     }
 
+    /**
+     * Show the ticket creation form in Discord
+     * @param member The member to show the form to
+     * @param button The button clicked
+     * @param interaction The member interaction. Used to reply error/form
+     */
     public void showTicketCreationForm(Member member, Button button, ComponentInteraction interaction) {
         if(member == null) {
             interaction.reply("Error ! Ticket buttons are only usable in servers")
@@ -79,6 +85,12 @@ public class TicketService {
         interaction.replyModal(form).queue();
     }
 
+    /**
+     * Create a new ticket channel.
+     * Will create a new channel category if it doesn't exist
+     * @param guild The guild in which the ticket channel needs to be created
+     * @return The created text channel
+     */
     public TextChannel createTicketChannel(Guild guild) {
         // Get or create tickets category
         Role everyoneRole = guild.getPublicRole();
@@ -98,6 +110,12 @@ public class TicketService {
         return ticketsCategory.createTextChannel(ticketName).complete();
     }
 
+    /**
+     * Send the created ticket in the given channel
+     * @param member The member creating the ticket
+     * @param ticketChannel The channel to send the ticket to (Can be created using {@link  TicketService#createTicketChannel(Guild)})
+     * @param event The modal event. Used to get the ticket content and reply
+     */
     public void sendTicketToChannel(Member member, TextChannel ticketChannel, ModalInteractionEvent event) {
         // Make ticket embed
         String senderName = "%s (@%s)".formatted(member.getEffectiveName(), member.getId());
@@ -127,6 +145,12 @@ public class TicketService {
                 .queue();
     }
 
+    /**
+     * Allow a user to see the ticket channel
+     * @param userId The user to invite
+     * @param channel The ticket channel the user is invited to
+     * @param interaction The interaction with the member that invites the user. Used to reply error or success message
+     */
     public void inviteUserToTicketChannel(String userId, TextChannel channel, ComponentInteraction interaction) {
         // Check user
         Guild guild = channel.getGuild();
