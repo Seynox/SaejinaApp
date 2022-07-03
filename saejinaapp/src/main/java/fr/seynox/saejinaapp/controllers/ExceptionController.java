@@ -8,6 +8,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+/**
+ * The class handling exceptions thrown in controllers
+ */
 @ControllerAdvice
 public class ExceptionController {
 
