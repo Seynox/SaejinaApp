@@ -26,7 +26,7 @@ import javax.validation.groups.Default;
  */
 @Controller
 @RequestMapping("/{serverId}/{channelId}")
-public class ActionController {
+public class TextChannelActionController {
 
     private static final String CHANNEL_NAME_ATTRIBUTE = "channelName";
 
@@ -34,7 +34,7 @@ public class ActionController {
     private final DiscordService service;
     private final TicketService ticketService;
 
-    public ActionController(MemberAccessService accessService, DiscordService service, TicketService ticketService) {
+    public TextChannelActionController(MemberAccessService accessService, DiscordService service, TicketService ticketService) {
         this.accessService = accessService;
         this.service = service;
         this.ticketService = ticketService;
@@ -68,7 +68,7 @@ public class ActionController {
      * @param channelId The channel to send the message to
      * @param principal The logged-in user
      * @throws ResourceNotAccessibleException When the server/channel is not accessible/writable for the user/bot.
-     * @return If successful, redirect to {@link ActionController#showMessageForm(Long, Long, OAuth2User, Model)} with a success parameter
+     * @return If successful, redirect to {@link TextChannelActionController#showMessageForm(Long, Long, OAuth2User, Model)} with a success parameter
      */
     @PostMapping("/send_message")
     public String sendMessageInChannel(@Validated({Default.class, Message.class}) @ModelAttribute("message") StringRequest message, BindingResult result, @PathVariable Long serverId, @PathVariable Long channelId, @AuthenticationPrincipal OAuth2User principal, Model model) {
@@ -118,7 +118,7 @@ public class ActionController {
      * @param principal The logged-in user
      * @throws ResourceNotAccessibleException When the server/channel is not accessible/writable for the user/bot.
      * @throws PermissionException If the member is not allowed to send ticket buttons on the server.
-     * @return If successful, redirect to {@link ActionController#showTicketButtonForm(Long, Long, OAuth2User, Model)} with a success parameter
+     * @return If successful, redirect to {@link TextChannelActionController#showTicketButtonForm(Long, Long, OAuth2User, Model)} with a success parameter
      */
     @PostMapping("/send_ticket_button")
     public String sendTicketButton(@Validated({Default.class, Button.class}) @ModelAttribute("buttonLabel") StringRequest buttonLabel, BindingResult result, @PathVariable Long serverId, @PathVariable Long channelId, @AuthenticationPrincipal OAuth2User principal, Model model) {

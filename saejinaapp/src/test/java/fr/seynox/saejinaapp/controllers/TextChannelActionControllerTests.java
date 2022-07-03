@@ -26,8 +26,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(ActionController.class)
-class ActionControllerTests {
+@WebMvcTest(TextChannelActionController.class)
+class TextChannelActionControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
