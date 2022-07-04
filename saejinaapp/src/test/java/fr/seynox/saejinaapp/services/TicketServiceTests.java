@@ -53,6 +53,7 @@ class TicketServiceTests {
         MessageAction action = Mockito.mock(MessageAction.class);
 
         when(member.hasPermission(Permission.MANAGE_CHANNEL)).thenReturn(true);
+        when(channel.canTalk(member)).thenReturn(true);
         when(channel.sendMessage("⌄")).thenReturn(action);
         when(action.setActionRow(expectedButton)).thenReturn(action);
         // WHEN

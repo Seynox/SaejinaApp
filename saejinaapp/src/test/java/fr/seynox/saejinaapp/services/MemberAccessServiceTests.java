@@ -7,6 +7,7 @@ import fr.seynox.saejinaapp.models.Selectable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.requests.RestAction;
 import org.junit.jupiter.api.BeforeEach;
@@ -295,6 +296,59 @@ class MemberAccessServiceTests {
         verify(guild).getTextChannelById(channelId);
         verify(channel).canTalk(member);
         verify(channel).canTalk();
+    }
+
+    @Test
+    void getAssignableServerRoleTest() {
+        // GIVEN
+        long roleId = 123456789;
+        Role role = Mockito.mock(Role.class);
+
+        Role result;
+
+        when(member.getGuild()).thenReturn(guild);
+        when(guild.getRoleById(anyLong())).thenReturn(role);
+        when(member.canInteract(any(Role.class))).thenReturn(true);
+        // WHEN
+        result = service.getAssignableServerRole(member, roleId);
+
+        // THEN
+        verify(guild).getRoleById(roleId);
+        verify(member).canInteract(role);
+        assertThat(result).isEqualTo(role);
+    }
+
+    @Test
+    void refuseUnknownServerRoleTest() {
+        // GIVEN
+        long roleId = 123456789;
+
+        when(member.getGuild()).thenReturn(guild);
+        when(guild.getRoleById(anyLong())).thenReturn(null);
+        // WHEN
+        assertThatExceptionOfType(ResourceNotAccessibleException.class)
+                .isThrownBy(() -> service.getAssignableServerRole(member, roleId));
+
+        // THEN
+        verify(guild).getRoleById(roleId);
+    }
+
+    @Test
+    void refuseNonAssignableServerRoleTest() {
+        // GIVEN
+        long roleId = 123456789;
+        Role role = Mockito.mock(Role.class);
+
+        when(member.getGuild()).thenReturn(guild);
+        when(guild.getRoleById(anyLong())).thenReturn(role);
+        when(member.canInteract(any(Role.class))).thenReturn(false);
+        // WHEN
+        assertThatExceptionOfType(PermissionException.class)
+                .isThrownBy(() -> service.getAssignableServerRole(member, roleId));
+
+        // THEN
+        verify(guild).getRoleById(roleId);
+        verify(member).canInteract(role);
     }
 
 }

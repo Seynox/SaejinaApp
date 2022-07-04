@@ -7,6 +7,7 @@ import fr.seynox.saejinaapp.models.Selectable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -96,5 +97,27 @@ public class MemberAccessService {
         return channel;
     }
 
+    /**
+     * Get the server role if it exists and is assignable to the user
+     * @param member The member getting the role
+     * @param roleId The role to get
+     * @throws ResourceNotAccessibleException If the role does not exist
+     * @throws PermissionException If the member does not have the permission to assign the role
+     * @return The assignable role
+     */
+    public Role getAssignableServerRole(Member member, Long roleId) {
 
+        Guild guild = member.getGuild();
+        Role role = guild.getRoleById(roleId);
+
+        if(role == null) {
+            throw new ResourceNotAccessibleException("The role requested does not exist");
+        }
+
+        if(!member.canInteract(role)) {
+            throw new PermissionException("You do not have the permission to interact with this role");
+        }
+
+        return role;
+    }
 }
