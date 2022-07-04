@@ -52,14 +52,14 @@ class TicketServiceTests {
         Button expectedButton = Button.of(ButtonStyle.SECONDARY, "ticket-creation", label, Emoji.fromUnicode("U+1F39F"));
         MessageAction action = Mockito.mock(MessageAction.class);
 
-        when(member.hasPermission(Permission.MANAGE_SERVER)).thenReturn(true);
+        when(member.hasPermission(Permission.MANAGE_CHANNEL)).thenReturn(true);
         when(channel.sendMessage("⌄")).thenReturn(action);
         when(action.setActionRow(expectedButton)).thenReturn(action);
         // WHEN
         service.sendTicketButtonInChannel(member, channel, label);
 
         // THEN
-        verify(member).hasPermission(Permission.MANAGE_SERVER);
+        verify(member).hasPermission(Permission.MANAGE_CHANNEL);
         verify(channel).sendMessage("⌄");
         verify(action).setActionRow(expectedButton);
         verify(action).queue();
@@ -70,7 +70,7 @@ class TicketServiceTests {
         // GIVEN
         String label = "My Button !";
 
-        when(member.hasPermission(Permission.MANAGE_SERVER)).thenReturn(false);
+        when(member.hasPermission(Permission.MANAGE_CHANNEL)).thenReturn(false);
         // WHEN
         assertThatExceptionOfType(PermissionException.class)
                 .isThrownBy(() -> service.sendTicketButtonInChannel(member, channel, label));

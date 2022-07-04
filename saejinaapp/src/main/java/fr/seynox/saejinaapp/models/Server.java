@@ -13,9 +13,4 @@ public class Server implements Selectable {
     private String iconUrl;
     private Long id;
 
-    @Override
-    public String getId() {
-        return String.valueOf(id);
-    }
-
 }

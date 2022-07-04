@@ -2,7 +2,8 @@ package fr.seynox.saejinaapp.services;
 
 import fr.seynox.saejinaapp.exceptions.PermissionException;
 import fr.seynox.saejinaapp.exceptions.ResourceNotAccessibleException;
-import fr.seynox.saejinaapp.models.DiscordTextChannel;
+import fr.seynox.saejinaapp.models.SelectableImpl;
+import fr.seynox.saejinaapp.models.Selectable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -153,12 +154,12 @@ class MemberAccessServiceTests {
 
         List<TextChannel> channels = List.of(channelOne, channelTwo);
 
-        List<DiscordTextChannel> expected = List.of(
-                new DiscordTextChannel(1L, "Channel One"),
-                new DiscordTextChannel(2L, "Channel Two")
+        List<SelectableImpl> expected = List.of(
+                new SelectableImpl(1L, "Channel One"),
+                new SelectableImpl(2L, "Channel Two")
         );
 
-        List<DiscordTextChannel> result;
+        List<Selectable> result;
 
         when(channelOne.getName()).thenReturn("Channel One");
         when(channelOne.getIdLong()).thenReturn(1L);
@@ -181,7 +182,7 @@ class MemberAccessServiceTests {
     @Test
     void getVisibleServerTextChannelsWithNoChannelTest() {
         // GIVEN
-        List<DiscordTextChannel> result;
+        List<Selectable> result;
 
         when(member.getGuild()).thenReturn(guild);
         when(guild.getTextChannels()).thenReturn(List.of());
@@ -202,9 +203,9 @@ class MemberAccessServiceTests {
 
         List<TextChannel> channels = List.of(visibleChannel, invisibleChannel);
 
-        List<DiscordTextChannel> expected = List.of(new DiscordTextChannel(1L, "Channel One"));
+        List<SelectableImpl> expected = List.of(new SelectableImpl(1L, "Channel One"));
 
-        List<DiscordTextChannel> result;
+        List<Selectable> result;
 
         when(visibleChannel.getName()).thenReturn("Channel One");
         when(visibleChannel.getIdLong()).thenReturn(1L);

@@ -1,8 +1,9 @@
 package fr.seynox.saejinaapp.controllers;
 
 import fr.seynox.saejinaapp.exceptions.ResourceNotAccessibleException;
+import fr.seynox.saejinaapp.models.Selectable;
 import fr.seynox.saejinaapp.models.Server;
-import fr.seynox.saejinaapp.models.DiscordTextChannel;
+import fr.seynox.saejinaapp.models.SelectableImpl;
 import fr.seynox.saejinaapp.models.TextChannelAction;
 import fr.seynox.saejinaapp.services.MemberAccessService;
 import fr.seynox.saejinaapp.services.DiscordService;
@@ -84,9 +85,9 @@ class SelectionControllerTests {
         RequestBuilder request = get(requestUri)
                 .with(oauth2Login().attributes(attrs -> attrs.put("sub", userId))); // "sub" is the default nameAttributeKey
 
-        List<DiscordTextChannel> channels = List.of(
-                new DiscordTextChannel(123456L, "Channel One"),
-                new DiscordTextChannel(987654L, "Channel Two")
+        List<Selectable> channels = List.of(
+                new SelectableImpl(123456L, "Channel One"),
+                new SelectableImpl(987654L, "Channel Two")
         );
 
         Member member = Mockito.mock(Member.class);

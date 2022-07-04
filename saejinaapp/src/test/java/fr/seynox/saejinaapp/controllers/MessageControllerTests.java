@@ -26,17 +26,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(TextChannelActionController.class)
-class TextChannelActionControllerTests {
+@WebMvcTest(MessageController.class)
+class MessageControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
     private DiscordService service;
-
-    @MockBean
-    private TicketService ticketService;
 
     @MockBean
     private MemberAccessService accessService;
@@ -222,138 +219,6 @@ class TextChannelActionControllerTests {
         verify(accessService).getServerMember(userId, serverId);
         verify(accessService).getWritableServerTextChannel(member, channelId);
         verify(service, never()).sendMessageInChannel(any(), any(), any());
-    }
-
-    @Test
-    void showTicketButtonFormTest() throws Exception {
-        // GIVEN
-        String channelName = "my-channel";
-
-        String requestUri = "/%s/%s/send_ticket_button"
-                .formatted(serverId, channelId);
-
-        RequestBuilder request = get(requestUri)
-                .with(oauth2Login().attributes(attrs -> attrs.put("sub", userId))); // "sub" is the default nameAttributeKey
-
-        when(accessService.getServerMember(userId, serverId)).thenReturn(member);
-        when(accessService.getWritableServerTextChannel(member, channelId)).thenReturn(channel);
-        when(channel.getName()).thenReturn(channelName);
-        // WHEN
-        mockMvc.perform(request)
-                .andExpect(status().isOk())
-                .andExpect(model().attributeExists("buttonLabel"))
-                .andExpect(model().attribute("channelName", channelName))
-                .andExpect(view().name("/action/ticket_button"));
-
-        // THEN
-        verify(accessService).getServerMember(userId, serverId);
-        verify(accessService).getWritableServerTextChannel(member, channelId);
-    }
-
-    @Test
-    void refuseTicketButtonFormUnauthenticatedTest() throws Exception {
-        // GIVEN
-        String requestUri = "/%s/%s/send_ticket_button"
-                .formatted(serverId, channelId);
-
-        RequestBuilder request = get(requestUri);
-
-        // WHEN
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized());
-
-        // THEN
-        verify(accessService, never()).getServerMember(any(), any());
-        verify(accessService, never()).getWritableServerTextChannel(any(), any());
-    }
-
-    @Test
-    void sendTicketButtonTest() throws Exception {
-        // GIVEN
-        String content = "This is my button label !";
-        String body = "content=%s"
-                .formatted(URLEncoder.encode(content, StandardCharsets.UTF_8));
-
-        String requestUri = "/%s/%s/send_ticket_button"
-                .formatted(serverId, channelId);
-
-        RequestBuilder request = post(requestUri)
-                .with(oauth2Login().attributes(attrs -> attrs.put("sub", userId))) // "sub" is the default nameAttributeKey
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content(body)
-                .with(csrf());
-
-        when(accessService.getServerMember(userId, serverId)).thenReturn(member);
-        when(accessService.getWritableServerTextChannel(member, channelId)).thenReturn(channel);
-        // WHEN
-        mockMvc.perform(request)
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("?success"));
-
-        // THEN
-        verify(accessService).getServerMember(userId, serverId);
-        verify(accessService).getWritableServerTextChannel(member, channelId);
-        verify(ticketService).sendTicketButtonInChannel(member, channel, content);
-    }
-
-    @Test
-    void refuseTicketButtonWithLabelTooLongTest() throws Exception {
-        // GIVEN
-        String content = "A".repeat(81);
-        String body = "content=%s"
-                .formatted(URLEncoder.encode(content, StandardCharsets.UTF_8));
-
-        String requestUri = "/%s/%s/send_ticket_button"
-                .formatted(serverId, channelId);
-
-        RequestBuilder request = post(requestUri)
-                .with(oauth2Login().attributes(attrs -> attrs.put("sub", userId))) // "sub" is the default nameAttributeKey
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content(body)
-                .with(csrf());
-
-        when(accessService.getServerMember(userId, serverId)).thenReturn(member);
-        when(accessService.getWritableServerTextChannel(member, channelId)).thenReturn(channel);
-        // WHEN
-        mockMvc.perform(request)
-                .andExpect(status().isOk())
-                .andExpect(model().errorCount(1))
-                .andExpect(model().attributeHasFieldErrorCode("buttonLabel", "content", "Size"));
-
-        // THEN
-        verify(accessService).getServerMember(userId, serverId);
-        verify(accessService).getWritableServerTextChannel(member, channelId);
-        verify(ticketService, never()).sendTicketButtonInChannel(any(), any(), any());
-    }
-
-    @Test
-    void refuseTicketButtonWithBlankLabelTest() throws Exception {
-        // GIVEN
-        String content = "     ";
-        String body = "content=%s"
-                .formatted(URLEncoder.encode(content, StandardCharsets.UTF_8));
-
-        String requestUri = "/%s/%s/send_ticket_button"
-                .formatted(serverId, channelId);
-
-        RequestBuilder request = post(requestUri)
-                .with(oauth2Login().attributes(attrs -> attrs.put("sub", userId))) // "sub" is the default nameAttributeKey
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .content(body)
-                .with(csrf());
-
-        when(accessService.getServerMember(userId, serverId)).thenReturn(member);
-        when(accessService.getWritableServerTextChannel(member, channelId)).thenReturn(channel);
-        // WHEN
-        mockMvc.perform(request)
-                .andExpect(status().isOk())
-                .andExpect(model().errorCount(1))
-                .andExpect(model().attributeHasFieldErrorCode("buttonLabel", "content", "NotBlank"));
-
-        // THEN
-        verify(accessService).getServerMember(userId, serverId);
-        verify(accessService).getWritableServerTextChannel(member, channelId);
-        verify(ticketService, never()).sendTicketButtonInChannel(any(), any(), any());
     }
 
 }

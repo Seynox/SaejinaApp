@@ -2,7 +2,8 @@ package fr.seynox.saejinaapp.services;
 
 import fr.seynox.saejinaapp.exceptions.PermissionException;
 import fr.seynox.saejinaapp.exceptions.ResourceNotAccessibleException;
-import fr.seynox.saejinaapp.models.DiscordTextChannel;
+import fr.seynox.saejinaapp.models.SelectableImpl;
+import fr.seynox.saejinaapp.models.Selectable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -64,12 +65,12 @@ public class MemberAccessService {
      * Get all server text channels that are accessible to the given user
      * @return A list of text channels visible to the user
      */
-    public List<DiscordTextChannel> getServerTextChannels(@NonNull Member member) {
+    public List<Selectable> getServerTextChannels(@NonNull Member member) {
         Guild server = member.getGuild();
 
         return server.getTextChannels().stream()
                 .filter(member::hasAccess)
-                .map(channel -> new DiscordTextChannel(channel.getIdLong(), channel.getName()))
+                .map(channel -> (Selectable) new SelectableImpl(channel.getIdLong(), channel.getName()))
                 .toList();
     }
 

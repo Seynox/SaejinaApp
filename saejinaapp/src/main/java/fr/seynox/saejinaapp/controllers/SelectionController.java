@@ -1,8 +1,8 @@
 package fr.seynox.saejinaapp.controllers;
 
 import fr.seynox.saejinaapp.exceptions.ResourceNotAccessibleException;
+import fr.seynox.saejinaapp.models.Selectable;
 import fr.seynox.saejinaapp.models.Server;
-import fr.seynox.saejinaapp.models.DiscordTextChannel;
 import fr.seynox.saejinaapp.models.TextChannelAction;
 import fr.seynox.saejinaapp.services.MemberAccessService;
 import fr.seynox.saejinaapp.services.DiscordService;
@@ -66,7 +66,7 @@ public class SelectionController {
         String userId = principal.getName();
 
         Member member = accessService.getServerMember(userId, serverId);
-        List<DiscordTextChannel> discordTextChannels = accessService.getServerTextChannels(member);
+        List<Selectable> discordTextChannels = accessService.getServerTextChannels(member);
 
         model.addAttribute(SELECTABLE_LIST_ATTRIBUTE, discordTextChannels);
         model.addAttribute(PAGE_TITLE_ATTRIBUTE, "Channel Selection");

@@ -17,7 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -93,13 +92,11 @@ class DiscordServiceTests {
     void getPossibleActionsForChannelTest() {
         // GIVEN
 
-        List<TextChannelAction> expected = Arrays.stream(TextChannelAction.values())
-                .filter(action -> !action.getId().equals(TextChannelAction.SEND_TICKET_BUTTON.getId()))
-                .toList();
+        List<TextChannelAction> expected = List.of(TextChannelAction.SEND_MESSAGE);
 
         List<TextChannelAction> result;
 
-        when(member.hasPermission(Permission.MANAGE_SERVER)).thenReturn(false);
+        when(member.hasPermission(Permission.MANAGE_CHANNEL)).thenReturn(false);
         when(channel.canTalk(member)).thenReturn(true);
         // WHEN
         result = service.getPossibleActionsForChannel(member, channel);
