@@ -114,7 +114,7 @@ public class MemberAccessService {
             throw new ResourceNotAccessibleException("The role requested does not exist");
         }
 
-        if(!member.canInteract(role)) {
+        if(!member.canInteract(role) || role.isPublicRole()) {
             throw new PermissionException("You do not have the permission to interact with this role");
         }
 

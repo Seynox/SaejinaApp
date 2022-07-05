@@ -351,4 +351,24 @@ class MemberAccessServiceTests {
         verify(member).canInteract(role);
     }
 
+    @Test
+    void refuseServerPublicRoleTest() {
+        // GIVEN
+        long roleId = 123456789;
+        Role role = Mockito.mock(Role.class);
+
+        when(member.getGuild()).thenReturn(guild);
+        when(guild.getRoleById(anyLong())).thenReturn(role);
+        when(member.canInteract(any(Role.class))).thenReturn(true);
+        when(role.isPublicRole()).thenReturn(true);
+        // WHEN
+        assertThatExceptionOfType(PermissionException.class)
+                .isThrownBy(() -> service.getAssignableServerRole(member, roleId));
+
+        // THEN
+        verify(guild).getRoleById(roleId);
+        verify(member).canInteract(role);
+        verify(role).isPublicRole();
+    }
+
 }
