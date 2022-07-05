@@ -1,5 +1,6 @@
 package fr.seynox.saejinaapp.listeners;
 
+import fr.seynox.saejinaapp.exceptions.DiscordInteractionException;
 import fr.seynox.saejinaapp.services.TicketService;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -8,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
+import net.dv8tion.jda.api.interactions.components.Modal;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import org.springframework.stereotype.Component;
@@ -36,15 +38,10 @@ public class TicketEventsListener {
     @SubscribeEvent
     public void onButtonPress(ButtonInteractionEvent event) {
 
-        Button button = event.getButton();
         String buttonId = event.getComponentId();
-
         switch(buttonId) {
             // Create ticket
-            case TICKET_CREATION_ID -> {
-                Member member = event.getMember();
-                service.showTicketCreationForm(member, button, event);
-            }
+            case TICKET_CREATION_ID -> showTicketCreationForm(event);
 
             // Ask close ticket confirmation
             case TICKET_CLOSE_ID -> {
@@ -54,8 +51,8 @@ public class TicketEventsListener {
 
             // Close ticket
             case TICKET_CLOSE_CONFIRM_ID -> {
-                event.reply("Closing the ticket ! Deleting channel in 10sec...").queue();
-                CompletableFuture.delayedExecutor(10L, TimeUnit.SECONDS)
+                event.reply("Closing the ticket ! Deleting channel in 30sec...").queue();
+                CompletableFuture.delayedExecutor(30L, TimeUnit.SECONDS)
                         .execute(() -> event.getTextChannel().delete().queue());
             }
 
@@ -63,12 +60,7 @@ public class TicketEventsListener {
                 // Invite user to ticket channel
                 if(invitePattern.matcher(buttonId).matches()) {
                     String userId = buttonId.split("#")[1];
-                    TextChannel channel = event.getTextChannel();
-
-                    service.inviteUserToTicketChannel(userId, channel, event);
-
-                    // Disable button
-                    event.editButton(button.asDisabled()).queue();
+                    inviteMemberToChannel(userId, event);
                 }
             }
 
@@ -90,6 +82,50 @@ public class TicketEventsListener {
     }
 
     /**
+     * Display a ticket creation modal (form) to the member that clicked the button
+     */
+    public void showTicketCreationForm(ButtonInteractionEvent event) {
+        Member member = event.getMember();
+        Button button = event.getButton();
+        try {
+            Modal modal = service.getTicketCreationForm(member, button);
+            event.replyModal(modal).queue();
+        } catch(DiscordInteractionException exception) {
+            String message = exception.getMessage();
+            event.reply(message)
+                    .setEphemeral(true)
+                    .queue();
+        }
+    }
+
+    /**
+     * Allow the given user to access the button's channel
+     * @param userId The user to invite
+     */
+    public void inviteMemberToChannel(String userId, ButtonInteractionEvent event) {
+        Button button = event.getButton();
+        TextChannel channel = event.getTextChannel();
+
+        try {
+            service.inviteUserToTicketChannel(userId, channel);
+            String message = "The ticket owner (%s) has been invited to the channel !"
+                    .formatted("<@" + userId + '>');
+            event.reply(message).queue();
+
+        } catch(DiscordInteractionException exception) {
+            String errorMessage = exception.getMessage();
+            event.reply(errorMessage)
+                    .setEphemeral(true)
+                    .queue();
+
+            return;
+        }
+
+        // Disable button
+        event.editButton(button.asDisabled()).queue();
+    }
+
+    /**
      *  Submits a ticket to the server via a modal (form)
      */
     public void submitTicketToServer(ModalInteractionEvent event) {
@@ -104,18 +140,20 @@ public class TicketEventsListener {
 
         Guild guild = member.getGuild();
 
+        String message;
         try {
             TextChannel ticketChannel = service.createTicketChannel(guild);
             service.sendTicketToChannel(member, ticketChannel, event);
+            message = "Your ticket was submitted !";
         } catch(InsufficientPermissionException exception) {
-            event.reply("Error ! I do not have the permissions required to create channels. Please contact a server administrator")
-                    .setEphemeral(true)
-                    .queue();
+            message = "Error ! I do not have the permissions required to create channels. Please contact a server administrator";
         } catch(NullPointerException exception) {
-            event.reply("Error ! The ticket you submitted is invalid")
-                    .setEphemeral(true)
-                    .queue();
+            message = "Error ! The ticket you submitted is invalid";
         }
+
+        event.reply(message)
+                .setEphemeral(true)
+                .queue();
     }
 
 }

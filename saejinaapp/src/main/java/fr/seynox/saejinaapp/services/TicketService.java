@@ -1,12 +1,12 @@
 package fr.seynox.saejinaapp.services;
 
+import fr.seynox.saejinaapp.exceptions.DiscordInteractionException;
 import fr.seynox.saejinaapp.exceptions.PermissionException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.interactions.ModalInteraction;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
 import net.dv8tion.jda.api.interactions.components.Modal;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
@@ -53,18 +53,15 @@ public class TicketService {
     }
 
     /**
-     * Show the ticket creation form in Discord
+     * Create a ticket creation form
      * @param member The member to show the form to
      * @param button The button clicked
-     * @param interaction The member interaction. Used to reply error/form
+     * @throws DiscordInteractionException If the member is null
+     * @return The ticket creation form
      */
-    public void showTicketCreationForm(Member member, Button button, ComponentInteraction interaction) {
+    public Modal getTicketCreationForm(Member member, Button button) throws DiscordInteractionException {
         if(member == null) {
-            interaction.reply("Error ! Ticket buttons are only usable in servers")
-                    .setEphemeral(true)
-                    .queue();
-
-            return;
+            throw new DiscordInteractionException("Error ! Ticket buttons are only usable in servers");
         }
 
         TextInput subject = TextInput.create("subject", "Subject", TextInputStyle.SHORT)
@@ -78,11 +75,9 @@ public class TicketService {
                 .build();
 
         String buttonLabel = button.getLabel();
-        Modal form = Modal.create(TICKET_CREATION_ID, buttonLabel)
+        return Modal.create(TICKET_CREATION_ID, buttonLabel)
                 .addActionRows(ActionRow.of(subject), ActionRow.of(message))
                 .build();
-
-        interaction.replyModal(form).queue();
     }
 
     /**
@@ -114,14 +109,14 @@ public class TicketService {
      * Send the created ticket in the given channel
      * @param member The member creating the ticket
      * @param ticketChannel The channel to send the ticket to (Can be created using {@link  TicketService#createTicketChannel(Guild)})
-     * @param event The modal event. Used to get the ticket content and reply
+     * @param interaction The modal interaction. Used to get the ticket content
      */
-    public void sendTicketToChannel(Member member, TextChannel ticketChannel, ModalInteractionEvent event) {
+    public void sendTicketToChannel(Member member, TextChannel ticketChannel, ModalInteraction interaction) {
         // Make ticket embed
         String senderName = "%s (@%s)".formatted(member.getEffectiveName(), member.getId());
         String senderAvatar = member.getEffectiveAvatarUrl();
-        String subject = Objects.requireNonNull(event.getValue("subject")).getAsString();
-        String body = Objects.requireNonNull(event.getValue("body")).getAsString();
+        String subject = Objects.requireNonNull(interaction.getValue("subject")).getAsString();
+        String body = Objects.requireNonNull(interaction.getValue("body")).getAsString();
 
         MessageEmbed ticketEmbed = new EmbedBuilder()
                 .setTitle(subject)
@@ -138,40 +133,26 @@ public class TicketService {
         ticketChannel.sendMessageEmbeds(ticketEmbed)
                 .setActionRows(ActionRow.of(userInvite, closeTicket))
                 .queue();
-
-        // Send success message
-        event.reply("Your ticket was submitted !")
-                .setEphemeral(true)
-                .queue();
     }
 
     /**
      * Allow a user to see the ticket channel
      * @param userId The user to invite
      * @param channel The ticket channel the user is invited to
-     * @param interaction The interaction with the member that invites the user. Used to reply error or success message
+     * @throws DiscordInteractionException If the user could not be found in the server
      */
-    public void inviteUserToTicketChannel(String userId, TextChannel channel, ComponentInteraction interaction) {
+    public void inviteUserToTicketChannel(String userId, TextChannel channel) throws DiscordInteractionException {
         // Check user
         Guild guild = channel.getGuild();
         Member member = guild.retrieveMemberById(userId).complete();
         if(member == null) {
-            interaction.reply("Error ! The user could not be found in the server")
-                    .setEphemeral(true)
-                    .queue();
-            return;
+            throw new DiscordInteractionException("Error ! The user could not be found in the server");
         }
 
         // Add user to channel
         channel.getManager()
                 .putMemberPermissionOverride(member.getIdLong(), List.of(Permission.VIEW_CHANNEL), List.of())
                 .queue();
-
-        // Send success message
-        String successMessage = "The ticket owner (%s) has been invited to the channel !"
-                .formatted(member.getAsMention());
-
-        interaction.reply(successMessage).queue();
     }
 
 }
