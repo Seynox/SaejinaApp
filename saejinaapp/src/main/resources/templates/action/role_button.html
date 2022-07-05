@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Send Role Button</title>
+</head>
+<body>
+    <div>
+        Logged in as user: <b th:inline="text"> [[${#httpServletRequest.remoteUser}]] </b>
+    </div>
+    <div th:if="${param.keySet().contains('success')}">
+        <p class="success">The role assignment button was successfully sent !</p>
+    </div>
+
+    <h1>Send to <b th:text="${channelName}"></b> a button used to assign a role</h1>
+    <div>
+        <form th:object="${roleId}" method="post">
+
+            <p th:if="${#fields.hasErrors('id')}" class="text-danger" th:errors="*{id}"></p>
+            <label for="id">Role :</label>
+            <select id="id" th:field="*{id}">
+                <option th:each="role : ${roles}" th:value="${role.getId()}" th:text="${role.getName()}"></option>
+            </select>
+
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+            <input type="submit" value="Send">
+        </form>
+    </div>
+</body>
+</html>

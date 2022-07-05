@@ -128,6 +128,48 @@ class TicketControllerTests {
     }
 
     @Test
+    void refuseTicketButtonUnauthenticatedTest() throws Exception {
+        // GIVEN
+        String requestUri = "/%s/%s/send_ticket_button"
+                .formatted(serverId, channelId);
+
+        RequestBuilder request = post(requestUri)
+                .with(csrf());
+
+        // WHEN
+        mockMvc.perform(request)
+                .andExpect(status().isUnauthorized());
+
+        // THEN
+        verify(accessService, never()).getServerMember(userId, serverId);
+        verify(service, never()).sendTicketButtonInChannel(any(), any(), any());
+    }
+
+    @Test
+    void refuseToSendTicketButtonWithNullBodyTest() throws Exception {
+        // GIVEN
+        String requestUri = "/%s/%s/send_ticket_button"
+                .formatted(serverId, channelId);
+
+        RequestBuilder request = post(requestUri)
+                .with(oauth2Login().attributes(attrs -> attrs.put("sub", userId))) // "sub" is the default nameAttributeKey
+                .with(csrf());
+
+        when(accessService.getServerMember(userId, serverId)).thenReturn(member);
+        when(accessService.getWritableServerTextChannel(member, channelId)).thenReturn(channel);
+        // WHEN
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(model().errorCount(1))
+                .andExpect(model().attributeHasFieldErrorCode("buttonLabel", "content", "NotBlank"));
+
+        // THEN
+        verify(accessService).getServerMember(userId, serverId);
+        verify(accessService).getWritableServerTextChannel(member, channelId);
+        verify(service, never()).sendTicketButtonInChannel(any(), any(), any());
+    }
+
+    @Test
     void refuseTicketButtonWithLabelTooLongTest() throws Exception {
         // GIVEN
         String content = "A".repeat(81);
