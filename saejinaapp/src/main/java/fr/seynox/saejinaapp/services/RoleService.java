@@ -1,5 +1,6 @@
 package fr.seynox.saejinaapp.services;
 
+import fr.seynox.saejinaapp.exceptions.DiscordInteractionException;
 import fr.seynox.saejinaapp.exceptions.PermissionException;
 import fr.seynox.saejinaapp.models.Selectable;
 import fr.seynox.saejinaapp.models.SelectableImpl;
@@ -58,6 +59,36 @@ public class RoleService {
         channel.sendMessage("⌄")
                 .setActionRow(roleButton)
                 .queue();
+    }
+
+    /**
+     * Adds the given role to the member. Removes it if the member already have it
+     * @param member The member affected
+     * @param roleId The role to toggle
+     * @throws DiscordInteractionException If the member or role is null
+     * @return True if the role was added, false if it was removed
+     */
+    public boolean toggleRoleForMember(Member member, Long roleId) throws DiscordInteractionException {
+        if(member == null) {
+            throw new DiscordInteractionException("Error ! Role buttons are only usable in servers");
+        }
+
+        Guild guild = member.getGuild();
+        Role role = guild.getRoleById(roleId);
+        if(role == null) {
+            throw new DiscordInteractionException("Error ! The role you're trying to assign does not exist anymore");
+        }
+
+        boolean alreadyHasRole = member.getRoles().stream()
+                .anyMatch(memberRole -> memberRole.getIdLong() == roleId);
+
+        if(alreadyHasRole) {
+            guild.removeRoleFromMember(member, role).queue();
+        } else {
+            guild.addRoleToMember(member, role).queue();
+        }
+
+        return !alreadyHasRole;
     }
 
 }

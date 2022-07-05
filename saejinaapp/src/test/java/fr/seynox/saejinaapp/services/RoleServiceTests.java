@@ -1,5 +1,6 @@
 package fr.seynox.saejinaapp.services;
 
+import fr.seynox.saejinaapp.exceptions.DiscordInteractionException;
 import fr.seynox.saejinaapp.exceptions.PermissionException;
 import fr.seynox.saejinaapp.models.Selectable;
 import fr.seynox.saejinaapp.models.SelectableImpl;
@@ -9,6 +10,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -173,6 +175,85 @@ class RoleServiceTests {
         // THEN
         verify(channel).canTalk(member);
         verify(member).hasPermission(Permission.MANAGE_CHANNEL);
+    }
+
+    @Test
+    void addRoleToMemberTest() throws DiscordInteractionException {
+        // GIVEN
+        long roleId = 123456789;
+        long placeholderRoleId = 987654321;
+        Role placeholderRole = Mockito.mock(Role.class);
+
+        AuditableRestAction<Void> action = Mockito.mock(AuditableRestAction.class);
+
+        List<Role> currentRoles = List.of(placeholderRole);
+
+        boolean wasRoleAdded;
+
+        when(member.getGuild()).thenReturn(guild);
+        when(guild.getRoleById(anyLong())).thenReturn(role);
+        when(member.getRoles()).thenReturn(currentRoles);
+        when(placeholderRole.getIdLong()).thenReturn(placeholderRoleId);
+        when(guild.addRoleToMember(any(Member.class), any(Role.class))).thenReturn(action);
+        // WHEN
+        wasRoleAdded = service.toggleRoleForMember(member, roleId);
+
+        // THEN
+        verify(guild).getRoleById(roleId);
+        verify(guild).addRoleToMember(member, role);
+        verify(guild, never()).removeRoleFromMember(any(), any());
+        assertThat(wasRoleAdded).isTrue();
+    }
+
+    @Test
+    void removeRoleFromMemberTest() throws DiscordInteractionException {
+        // GIVEN
+        long roleId = 123456789;
+
+        AuditableRestAction<Void> action = Mockito.mock(AuditableRestAction.class);
+
+        List<Role> currentRoles = List.of(role);
+
+        boolean wasRoleAdded;
+
+        when(member.getGuild()).thenReturn(guild);
+        when(guild.getRoleById(anyLong())).thenReturn(role);
+        when(member.getRoles()).thenReturn(currentRoles);
+        when(role.getIdLong()).thenReturn(roleId);
+        when(guild.removeRoleFromMember(any(Member.class), any(Role.class))).thenReturn(action);
+        // WHEN
+        wasRoleAdded = service.toggleRoleForMember(member, roleId);
+
+        // THEN
+        verify(guild).getRoleById(roleId);
+        verify(guild, never()).addRoleToMember(any(), any());
+        verify(guild).removeRoleFromMember(member, role);
+        assertThat(wasRoleAdded).isFalse();
+    }
+
+    @Test
+    void refuseToToggleRoleFromNullMemberTest() {
+        // GIVEN
+        long roleId = 123456789;
+
+        // WHEN
+        assertThatExceptionOfType(DiscordInteractionException.class) // THEN
+                .isThrownBy(() -> service.toggleRoleForMember(null, roleId));
+    }
+
+    @Test
+    void refuseToToggleNullRoleFromMemberTest() {
+        // GIVEN
+        long roleId = 123456789;
+
+        when(member.getGuild()).thenReturn(guild);
+        when(guild.getRoleById(anyLong())).thenReturn(null);
+        // WHEN
+        assertThatExceptionOfType(DiscordInteractionException.class)
+                .isThrownBy(() -> service.toggleRoleForMember(member, roleId));
+
+        // THEN
+        verify(guild).getRoleById(roleId);
     }
 
 }
