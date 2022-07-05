@@ -30,6 +30,7 @@ public class RoleService {
 
         return guild.getRoles().stream()
                 .filter(member::canInteract)
+                .filter(role -> !role.isPublicRole())
                 .map(role -> new SelectableImpl(role.getIdLong(), role.getName()))
                 .map(Selectable.class::cast)
                 .toList();

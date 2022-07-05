@@ -84,6 +84,34 @@ class RoleServiceTests {
     }
 
     @Test
+    void filterPublicRoleTest() {
+        // GIVEN
+        long roleId = 123456789;
+        String roleName = "My role";
+
+        Role publicRole = Mockito.mock(Role.class);
+        List<Role> roles = List.of(role, publicRole);
+
+        List<Selectable> expectedRoles = List.of(new SelectableImpl(roleId, roleName));
+        List<Selectable> result;
+
+        when(member.getGuild()).thenReturn(guild);
+        when(guild.getRoles()).thenReturn(roles);
+        when(member.canInteract(publicRole)).thenReturn(true);
+        when(role.isPublicRole()).thenReturn(false);
+        when(publicRole.isPublicRole()).thenReturn(true);
+        when(member.canInteract(role)).thenReturn(true);
+        when(role.getName()).thenReturn(roleName);
+        when(role.getIdLong()).thenReturn(roleId);
+        // WHEN
+        result = service.getAssignableRolesForMember(member);
+
+        // THEN
+        assertThat(result).containsExactlyElementsOf(expectedRoles);
+        verify(member, times(2)).canInteract(any(Role.class));
+    }
+
+    @Test
     void sendRoleButtonInChannelTest() {
         // GIVEN
         TextChannel channel = Mockito.mock(TextChannel.class);
