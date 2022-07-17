@@ -2,6 +2,7 @@ package fr.seynox.saejinaapp.services;
 
 import fr.seynox.saejinaapp.exceptions.DiscordInteractionException;
 import fr.seynox.saejinaapp.exceptions.PermissionException;
+import fr.seynox.saejinaapp.utils.ButtonUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -29,6 +30,12 @@ public class TicketService {
     public static final String TICKET_CLOSE_CONFIRM_ID =  "ticket-close-confirm";
     public static final String TICKETS_CATEGORY_NAME = "\uD83C\uDFAB | Tickets";
 
+    private final ButtonUtils buttonUtils;
+
+    public TicketService(ButtonUtils buttonUtils) {
+        this.buttonUtils = buttonUtils;
+    }
+
     /**
      * Send a button used to create tickets
      * WARNING ! This method does not check if the channel is writable for the bot/user, nor the length of the label
@@ -47,9 +54,7 @@ public class TicketService {
         Emoji ticketEmoji = Emoji.fromUnicode("U+1F39F");
         Button ticketButton = Button.of(ButtonStyle.SECONDARY, TICKET_CREATION_ID, label, ticketEmoji);
 
-        channel.sendMessage("⌄")
-                .setActionRow(ticketButton)
-                .queue();
+        buttonUtils.sendOrAppendButton(channel, ticketButton);
     }
 
     /**

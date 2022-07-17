@@ -2,6 +2,7 @@ package fr.seynox.saejinaapp.services;
 
 import fr.seynox.saejinaapp.exceptions.DiscordInteractionException;
 import fr.seynox.saejinaapp.exceptions.PermissionException;
+import fr.seynox.saejinaapp.utils.ButtonUtils;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.interactions.ModalInteraction;
@@ -31,13 +32,15 @@ import static org.mockito.Mockito.*;
 class TicketServiceTests {
 
     private TicketService service;
+    private ButtonUtils buttonUtils;
 
     private Member member;
     private TextChannel channel;
 
     @BeforeEach
     void initTest() {
-        service = new TicketService();
+        buttonUtils = Mockito.mock(ButtonUtils.class);
+        service = new TicketService(buttonUtils);
 
         member = Mockito.mock(Member.class);
         channel = Mockito.mock(TextChannel.class);
@@ -48,20 +51,15 @@ class TicketServiceTests {
         // GIVEN
         String label = "My Button !";
         Button expectedButton = Button.of(ButtonStyle.SECONDARY, "ticket-creation", label, Emoji.fromUnicode("U+1F39F"));
-        MessageAction action = Mockito.mock(MessageAction.class);
 
         when(member.hasPermission(Permission.MANAGE_CHANNEL)).thenReturn(true);
         when(channel.canTalk(member)).thenReturn(true);
-        when(channel.sendMessage("⌄")).thenReturn(action);
-        when(action.setActionRow(expectedButton)).thenReturn(action);
         // WHEN
         service.sendTicketButtonInChannel(member, channel, label);
 
         // THEN
         verify(member).hasPermission(Permission.MANAGE_CHANNEL);
-        verify(channel).sendMessage("⌄");
-        verify(action).setActionRow(expectedButton);
-        verify(action).queue();
+        verify(buttonUtils).sendOrAppendButton(channel, expectedButton);
     }
 
     @Test
@@ -75,7 +73,7 @@ class TicketServiceTests {
                 .isThrownBy(() -> service.sendTicketButtonInChannel(member, channel, label));
 
         // THEN
-        verify(channel, never()).sendMessage(any(String.class));
+        verify(buttonUtils, never()).sendOrAppendButton(any(), any());
     }
 
     @Test

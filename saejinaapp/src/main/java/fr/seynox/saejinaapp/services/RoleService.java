@@ -4,6 +4,7 @@ import fr.seynox.saejinaapp.exceptions.DiscordInteractionException;
 import fr.seynox.saejinaapp.exceptions.PermissionException;
 import fr.seynox.saejinaapp.models.Selectable;
 import fr.seynox.saejinaapp.models.SelectableImpl;
+import fr.seynox.saejinaapp.utils.ButtonUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -20,6 +21,12 @@ import static fr.seynox.saejinaapp.models.TextChannelAction.SEND_ROLE_BUTTON;
 public class RoleService {
 
     public static final String ROLE_ASSIGNMENT_TEMPLATE = "role-assign#%s";
+
+    private final ButtonUtils buttonUtils;
+
+    public RoleService(ButtonUtils buttonUtils) {
+        this.buttonUtils = buttonUtils;
+    }
 
     /**
      * Get all the roles that the member can assign
@@ -56,9 +63,7 @@ public class RoleService {
         String roleName = role.getName();
         Button roleButton = Button.of(ButtonStyle.SECONDARY, roleButtonId, roleName);
 
-        channel.sendMessage("⌄")
-                .setActionRow(roleButton)
-                .queue();
+        buttonUtils.sendOrAppendButton(channel, roleButton);
     }
 
     /**

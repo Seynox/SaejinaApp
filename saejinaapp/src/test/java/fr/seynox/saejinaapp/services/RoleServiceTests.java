@@ -4,6 +4,7 @@ import fr.seynox.saejinaapp.exceptions.DiscordInteractionException;
 import fr.seynox.saejinaapp.exceptions.PermissionException;
 import fr.seynox.saejinaapp.models.Selectable;
 import fr.seynox.saejinaapp.models.SelectableImpl;
+import fr.seynox.saejinaapp.utils.ButtonUtils;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -11,7 +12,6 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -26,6 +26,7 @@ import static org.mockito.Mockito.*;
 class RoleServiceTests {
 
     private RoleService service;
+    private ButtonUtils buttonUtils;
 
     private Member member;
     private Guild guild;
@@ -33,7 +34,8 @@ class RoleServiceTests {
 
     @BeforeEach
     void initTest() {
-        service = new RoleService();
+        buttonUtils = Mockito.mock(ButtonUtils.class);
+        service = new RoleService(buttonUtils);
 
         member = Mockito.mock(Member.class);
         guild = Mockito.mock(Guild.class);
@@ -123,7 +125,6 @@ class RoleServiceTests {
 
         String expectedButtonId = "role-assign#123456789";
 
-        MessageAction action = Mockito.mock(MessageAction.class);
         ArgumentCaptor<Button> captor = ArgumentCaptor.forClass(Button.class);
 
         when(channel.canTalk(any(Member.class))).thenReturn(true);
@@ -131,16 +132,13 @@ class RoleServiceTests {
 
         when(role.getIdLong()).thenReturn(roleId);
         when(role.getName()).thenReturn(roleName);
-        when(channel.sendMessage(anyString())).thenReturn(action);
-        when(action.setActionRow(any(Button.class))).thenReturn(action);
         // WHEN
         service.sendRoleButtonInChannel(member, channel, role);
 
         // THEN
         verify(channel).canTalk(member);
         verify(member).hasPermission(Permission.MANAGE_CHANNEL);
-        verify(action).setActionRow(captor.capture());
-        verify(action).queue();
+        verify(buttonUtils).sendOrAppendButton(eq(channel), captor.capture());
 
         Button button = captor.getValue();
         assertThat(button.getId()).isEqualTo(expectedButtonId);
@@ -159,6 +157,7 @@ class RoleServiceTests {
 
         // THEN
         verify(channel).canTalk(member);
+        verify(buttonUtils, never()).sendOrAppendButton(any(), any());
     }
 
     @Test
@@ -175,6 +174,7 @@ class RoleServiceTests {
         // THEN
         verify(channel).canTalk(member);
         verify(member).hasPermission(Permission.MANAGE_CHANNEL);
+        verify(buttonUtils, never()).sendOrAppendButton(any(), any());
     }
 
     @Test
