@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SelectableImpl implements Selectable {
 
-    private Long id;
+    private Object id;
     private String name;
 
 }

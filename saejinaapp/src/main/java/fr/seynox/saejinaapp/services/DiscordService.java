@@ -1,13 +1,13 @@
 package fr.seynox.saejinaapp.services;
 
 import fr.seynox.saejinaapp.exceptions.PermissionException;
+import fr.seynox.saejinaapp.models.Selectable;
+import fr.seynox.saejinaapp.models.SelectableImpl;
 import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.TextChannelAction;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -80,4 +80,23 @@ public class DiscordService {
         channel.sendMessage(content).queue();
     }
 
+    /**
+     * Get all mentionable roles in guild
+     * @return A list of Selectable containing the role name and its mention as id
+     */
+    public List<Selectable> getMentionableRoles(Guild guild) {
+        return guild.getRoles().stream()
+                .filter(Role::isMentionable)
+                .map(role -> (Selectable) new SelectableImpl(role.getAsMention(), role.getName()))
+                .toList();
+    }
+    /**
+     * Get all mentionable members in guild
+     * @return A list of Selectable containing the username and its mention as id
+     */
+    public List<Selectable> getMentionableUsers(Guild guild) {
+        return guild.getMembers().stream()
+                .map(user -> (Selectable) new SelectableImpl(user.getAsMention(), user.getEffectiveName()))
+                .toList();
+    }
 }

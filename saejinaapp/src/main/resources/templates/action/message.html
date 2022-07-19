@@ -27,5 +27,24 @@
             <input type="submit" value="Send">
         </form>
     </div>
+    <div>
+        <label for="mentions">Add a mention :</label>
+        <select id="mentions" onchange="addMentionToMessage(this.value); this.selectedIndex = -1;">
+            <option value="" hidden></option>
+            <optgroup label="Roles">
+                <option th:each="role : ${mentionableRoles}" th:text="${role.getName()}" th:value="${role.getId()}"></option>
+            </optgroup>
+            <optgroup label="Users">
+                <option th:each="user : ${mentionableUsers}" th:text="${user.getName()}" th:value="${user.getId()}"></option>
+            </optgroup>
+        </select>
+    </div>
+    <script>
+        function addMentionToMessage(mention) {
+            if(mention !== undefined && mention !== "") {
+                document.getElementById("content").value += mention;
+            }
+        }
+    </script>
 </body>
 </html>

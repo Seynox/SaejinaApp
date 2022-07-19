@@ -1,13 +1,12 @@
 package fr.seynox.saejinaapp.services;
 
 import fr.seynox.saejinaapp.exceptions.PermissionException;
+import fr.seynox.saejinaapp.models.Selectable;
+import fr.seynox.saejinaapp.models.SelectableImpl;
 import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.TextChannelAction;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.dv8tion.jda.internal.JDAImpl;
@@ -178,6 +177,68 @@ class DiscordServiceTests {
         verify(member).hasPermission(Permission.MESSAGE_MENTION_EVERYONE);
         verify(channel, never()).sendMessage(any(String.class));
         verify(action, never()).queue();
+    }
+
+    @Test
+    void getMentionableRolesTest() {
+        // GIVEN
+        String roleName = "My role !";
+        String roleMention = "<@&123456789>";
+
+        Guild guild = Mockito.mock(Guild.class);
+
+        Role role = Mockito.mock(Role.class);
+        Role nonMentionableRole = Mockito.mock(Role.class);
+        List<Role> roles = List.of(role, nonMentionableRole);
+
+        List<Selectable> expected = List.of(
+                new SelectableImpl(roleMention, roleName)
+        );
+
+        List<Selectable> result;
+
+        when(nonMentionableRole.isMentionable()).thenReturn(false);
+        when(role.isMentionable()).thenReturn(true);
+
+        when(role.getName()).thenReturn(roleName);
+        when(role.getAsMention()).thenReturn(roleMention);
+
+        when(guild.getRoles()).thenReturn(roles);
+        // WHEN
+        result = service.getMentionableRoles(guild);
+
+        // THEN
+        assertThat(result).containsExactlyElementsOf(expected);
+        verify(guild).getRoles();
+    }
+
+    @Test
+    void getMentionableUsersTest() {
+        // GIVEN
+        String username = "Bob1234";
+        String userMention = "<@123456789>";
+
+        Guild guild = Mockito.mock(Guild.class);
+
+        Member member = Mockito.mock(Member.class);
+        List<Member> members = List.of(member);
+
+        List<Selectable> expected = List.of(
+                new SelectableImpl(userMention, username)
+        );
+
+        List<Selectable> result;
+
+        when(member.getEffectiveName()).thenReturn(username);
+        when(member.getAsMention()).thenReturn(userMention);
+
+        when(guild.getMembers()).thenReturn(members);
+        // WHEN
+        result = service.getMentionableUsers(guild);
+
+        // THEN
+        assertThat(result).containsExactlyElementsOf(expected);
+        verify(guild).getMembers();
     }
 
 }

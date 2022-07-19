@@ -1,9 +1,11 @@
 package fr.seynox.saejinaapp.controllers;
 
 import fr.seynox.saejinaapp.exceptions.ResourceNotAccessibleException;
+import fr.seynox.saejinaapp.models.Selectable;
 import fr.seynox.saejinaapp.models.StringRequest;
 import fr.seynox.saejinaapp.services.DiscordService;
 import fr.seynox.saejinaapp.services.MemberAccessService;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -16,6 +18,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.groups.Default;
+
+import java.util.List;
 
 import static fr.seynox.saejinaapp.models.ViewTemplateConsts.CHANNEL_NAME_ATTRIBUTE;
 
@@ -44,7 +48,13 @@ public class MessageController {
         String userId = principal.getName();
         Member member = accessService.getServerMember(userId, serverId);
         TextChannel channel = accessService.getWritableServerTextChannel(member, channelId);
+        Guild guild = channel.getGuild();
 
+        List<Selectable> mentionableRoles = service.getMentionableRoles(guild);
+        List<Selectable> mentionableUsers = service.getMentionableUsers(guild);
+
+        model.addAttribute("mentionableRoles", mentionableRoles);
+        model.addAttribute("mentionableUsers", mentionableUsers);
         model.addAttribute("message", new StringRequest());
         model.addAttribute(CHANNEL_NAME_ATTRIBUTE, channel.getName());
 
