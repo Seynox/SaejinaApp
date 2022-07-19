@@ -2,7 +2,6 @@ package fr.seynox.saejinaapp.controllers;
 
 import fr.seynox.saejinaapp.exceptions.ResourceNotAccessibleException;
 import fr.seynox.saejinaapp.models.Selectable;
-import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.TextChannelAction;
 import fr.seynox.saejinaapp.services.MemberAccessService;
 import fr.seynox.saejinaapp.services.DiscordService;
@@ -14,10 +13,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
 @Controller
+@RequestMapping("/panel")
 public class SelectionController {
 
     private static final String SELECTION_TEMPLATE = "/selection/select";
@@ -40,10 +41,10 @@ public class SelectionController {
      * @param principal The logged-in user
      * @return The path to the Thymeleaf template
      */
-    @GetMapping("/")
+    @GetMapping
     public String showServerSelection(Model model, @AuthenticationPrincipal OAuth2User principal) {
         String userId = principal.getName();
-        List<Server> serverList = service.getUserServers(userId);
+        List<Selectable> serverList = service.getUserServers(userId);
 
         model.addAttribute(SELECTABLE_LIST_ATTRIBUTE, serverList);
         model.addAttribute(PAGE_TITLE_ATTRIBUTE, "Server Selection");

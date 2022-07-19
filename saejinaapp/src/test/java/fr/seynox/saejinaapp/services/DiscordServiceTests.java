@@ -3,7 +3,6 @@ package fr.seynox.saejinaapp.services;
 import fr.seynox.saejinaapp.exceptions.PermissionException;
 import fr.seynox.saejinaapp.models.Selectable;
 import fr.seynox.saejinaapp.models.SelectableImpl;
-import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.TextChannelAction;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -53,12 +52,12 @@ class DiscordServiceTests {
                 new GuildImpl(jda, 2L).setName("Guild Two")
         );
 
-        List<Server> expected = List.of(
-                new Server("Guild One", null, 1L),
-                new Server("Guild Two", null, 2L)
+        List<Selectable> expected = List.of(
+                new SelectableImpl(1L, null, "Guild One"),
+                new SelectableImpl(2L, null, "Guild Two")
         );
 
-        List<Server> result;
+        List<Selectable> result;
 
         when(jda.retrieveUserById(userId)).thenReturn(new CompletedRestAction<>(null, user));
         when(user.getMutualGuilds()).thenReturn(guilds);
@@ -76,7 +75,7 @@ class DiscordServiceTests {
         // GIVEN
         String userId = "123456";
 
-        List<Server> result;
+        List<Selectable> result;
 
         when(jda.retrieveUserById(userId)).thenReturn(new CompletedRestAction<>(null, null));
         // WHEN

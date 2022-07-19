@@ -21,7 +21,7 @@ import javax.validation.groups.Default;
 import static fr.seynox.saejinaapp.models.ViewTemplateConsts.CHANNEL_NAME_ATTRIBUTE;
 
 @Controller
-@RequestMapping("/{serverId}/{channelId}/send_ticket_button")
+@RequestMapping("/panel/{serverId}/{channelId}/send_ticket_button")
 public class TicketController {
 
     private final TicketService service;

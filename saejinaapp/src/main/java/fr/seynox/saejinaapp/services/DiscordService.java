@@ -3,7 +3,6 @@ package fr.seynox.saejinaapp.services;
 import fr.seynox.saejinaapp.exceptions.PermissionException;
 import fr.seynox.saejinaapp.models.Selectable;
 import fr.seynox.saejinaapp.models.SelectableImpl;
-import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.TextChannelAction;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
@@ -29,14 +28,14 @@ public class DiscordService {
      * Get all mutual servers for the given user
      * @return An empty list if the user is null
      */
-    public List<Server> getUserServers(String userId) {
+    public List<Selectable> getUserServers(String userId) {
         User user = jda.retrieveUserById(userId).complete();
         if(user == null) {
             return List.of();
         }
 
         return user.getMutualGuilds().stream()
-                .map(guild -> new Server(guild.getName(), guild.getIconUrl(), guild.getIdLong()))
+                .map(guild -> (Selectable) new SelectableImpl(guild.getIdLong(),guild.getIconUrl(), guild.getName()))
                 .toList();
     }
 

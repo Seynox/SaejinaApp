@@ -4,7 +4,6 @@ import fr.seynox.saejinaapp.models.Selectable;
 import fr.seynox.saejinaapp.models.SelectableImpl;
 import fr.seynox.saejinaapp.services.DiscordService;
 import fr.seynox.saejinaapp.services.MemberAccessService;
-import fr.seynox.saejinaapp.services.TicketService;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -64,7 +63,7 @@ class MessageControllerTests {
         // GIVEN
         String channelName = "my-channel";
 
-        String requestUri = "/%s/%s/send_message"
+        String requestUri = "/panel/%s/%s/send_message"
                 .formatted(serverId, channelId);
         RequestBuilder request = get(requestUri)
                 .with(oauth2Login().attributes(attrs -> attrs.put("sub", userId))); // "sub" is the default nameAttributeKey
@@ -92,7 +91,7 @@ class MessageControllerTests {
         List<Selectable> roles = List.of(new SelectableImpl("<@123456789>", "My role"));
         List<Selectable> users = List.of(new SelectableImpl("<@123456789>", "User One"));
 
-        String requestUri = "/%s/%s/send_message"
+        String requestUri = "/panel/%s/%s/send_message"
                 .formatted(serverId, channelId);
         RequestBuilder request = get(requestUri)
                 .with(oauth2Login().attributes(attrs -> attrs.put("sub", userId))); // "sub" is the default nameAttributeKey
@@ -119,7 +118,7 @@ class MessageControllerTests {
     @Test
     void refuseMessageFormUnauthenticatedTest() throws Exception {
         // GIVEN
-        String requestUri = "/%s/%s/send_message"
+        String requestUri = "/panel/%s/%s/send_message"
                 .formatted(serverId, channelId);
         RequestBuilder request = get(requestUri);
 
@@ -140,7 +139,7 @@ class MessageControllerTests {
         String body = "content=%s"
                 .formatted(URLEncoder.encode(content, StandardCharsets.UTF_8));
 
-        String requestUri = "/%s/%s/send_message"
+        String requestUri = "/panel/%s/%s/send_message"
                 .formatted(serverId, channelId);
 
         RequestBuilder request = post(requestUri)
@@ -169,7 +168,7 @@ class MessageControllerTests {
         String body = "content=%s"
                 .formatted(URLEncoder.encode(content, StandardCharsets.UTF_8));
 
-        String requestUri = "/%s/%s/send_message"
+        String requestUri = "/panel/%s/%s/send_message"
                 .formatted(serverId, channelId);
 
         RequestBuilder request = post(requestUri)
@@ -196,7 +195,7 @@ class MessageControllerTests {
         String body = "content=%s"
                 .formatted(URLEncoder.encode(content, StandardCharsets.UTF_8));
 
-        String requestUri = "/%s/%s/send_message"
+        String requestUri = "/panel/%s/%s/send_message"
                 .formatted(serverId, channelId);
 
         RequestBuilder request = post(requestUri)
@@ -231,7 +230,7 @@ class MessageControllerTests {
         String body = "content=%s"
                 .formatted(URLEncoder.encode(content, StandardCharsets.UTF_8));
 
-        String requestUri = "/%s/%s/send_message"
+        String requestUri = "/panel/%s/%s/send_message"
                 .formatted(serverId, channelId);
 
         RequestBuilder request = post(requestUri)

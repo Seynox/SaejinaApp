@@ -5,4 +5,6 @@ public interface Selectable {
     String getName();
     Object getId();
 
+    String getIconUrl();
+
 }

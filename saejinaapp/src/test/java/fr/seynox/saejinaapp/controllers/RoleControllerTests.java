@@ -67,7 +67,7 @@ class RoleControllerTests {
                 new SelectableImpl(2L, "Role Two")
         );
 
-        String requestUri = "/%s/%s/send_role_button"
+        String requestUri = "/panel/%s/%s/send_role_button"
                 .formatted(serverId, channelId);
 
         RequestBuilder request = get(requestUri)
@@ -93,7 +93,7 @@ class RoleControllerTests {
     @Test
     void refuseRoleButtonUnauthenticatedTest() throws Exception {
         // GIVEN
-        String requestUri = "/%s/%s/send_role_button"
+        String requestUri = "/panel/%s/%s/send_role_button"
                 .formatted(serverId, channelId);
 
         RequestBuilder request = get(requestUri);
@@ -117,7 +117,7 @@ class RoleControllerTests {
 
         String body = "id=%s".formatted(roleId);
 
-        String requestUri = "/%s/%s/send_role_button"
+        String requestUri = "/panel/%s/%s/send_role_button"
                 .formatted(serverId, channelId);
 
         RequestBuilder request = post(requestUri)
@@ -145,7 +145,7 @@ class RoleControllerTests {
     @Test
     void refuseToSendRoleButtonUnauthenticatedTest() throws Exception {
         // GIVEN
-        String requestUri = "/%s/%s/send_role_button"
+        String requestUri = "/panel/%s/%s/send_role_button"
                 .formatted(serverId, channelId);
 
         RequestBuilder request = post(requestUri)
@@ -165,7 +165,7 @@ class RoleControllerTests {
         // GIVEN
         String channelName = "roles-channel";
 
-        String requestUri = "/%s/%s/send_role_button"
+        String requestUri = "/panel/%s/%s/send_role_button"
                 .formatted(serverId, channelId);
 
         RequestBuilder request = post(requestUri)

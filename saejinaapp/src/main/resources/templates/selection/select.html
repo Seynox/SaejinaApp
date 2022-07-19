@@ -4,16 +4,23 @@
       lang="en">
 <head>
     <meta charset="UTF-8">
+    <link th:href="@{/css/selection.css}" rel="stylesheet" type="text/css">
     <title th:text="${pageTitle}"></title>
 </head>
 <body>
-    <div>
-        Logged in as user: <b th:inline="text"> [[${#httpServletRequest.remoteUser}]] </b>
-    </div>
-    <h1 th:text="${title}"></h1>
-    <div>
-        <div class="selectable" th:each="selectable : ${selectableList}">
-            <a th:href="@{{id}/(id=${selectable.getId()})}" th:text="${selectable.getName()}"></a>
+    <header>
+        <a id="back" href="../">&#x25c0; Go back</a>
+        <a href="/logout">Logout</a>
+    </header>
+    <div class="center">
+        <h1 th:text="${title}"></h1>
+        <div class="selectables">
+            <a th:href="@{{id}/(id=${selectable.getId()})}" th:each="selectable : ${selectableList}">
+                <div class="selectable">
+                    <img th:src="${selectable.getIconUrl() != null ? selectable.getIconUrl() : '/images/defaultIcon.png'}" th:alt="${selectable.getName()}" alt="Server Picture">
+                    <p th:text="${selectable.getName()}"></p>
+                </div>
+            </a>
         </div>
     </div>
 </body>

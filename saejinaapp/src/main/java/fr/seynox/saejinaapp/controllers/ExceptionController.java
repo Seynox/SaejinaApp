@@ -14,17 +14,20 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class ExceptionController {
 
+    private static final String ERROR_TEMPLATE_PATH = "/exception/error";
+    private static final String ERROR_MESSAGE_ATTRIBUTE = "message";
+
     private static final Logger LOGGER = LogManager.getLogger(ExceptionController.class);
 
     /**
      * Handles {@link ResourceNotAccessibleException}
      * @return The path to the Thymeleaf template
      */
-    @ExceptionHandler({SaejinaAppException.class})
+    @ExceptionHandler(SaejinaAppException.class)
     public String showSaejinaAppException(Exception exception, Model model) {
 
-        model.addAttribute("message", exception.getMessage());
-        return "/exception/error";
+        model.addAttribute(ERROR_MESSAGE_ATTRIBUTE, exception.getMessage());
+        return ERROR_TEMPLATE_PATH;
     }
 
     /**
@@ -35,8 +38,8 @@ public class ExceptionController {
     public String showErrorPage(Exception exception, Model model) {
         LOGGER.debug("An error occurred", exception);
 
-        model.addAttribute("message", "An error occurred");
-        return "/exception/error";
+        model.addAttribute(ERROR_MESSAGE_ATTRIBUTE, "An error occurred");
+        return ERROR_TEMPLATE_PATH;
     }
 
 }

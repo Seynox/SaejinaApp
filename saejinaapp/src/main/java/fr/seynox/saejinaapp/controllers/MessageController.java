@@ -24,7 +24,7 @@ import java.util.List;
 import static fr.seynox.saejinaapp.models.ViewTemplateConsts.CHANNEL_NAME_ATTRIBUTE;
 
 @Controller
-@RequestMapping("/{serverId}/{channelId}/send_message")
+@RequestMapping("/panel/{serverId}/{channelId}/send_message")
 public class MessageController {
 
     private final MemberAccessService accessService;

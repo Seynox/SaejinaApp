@@ -60,7 +60,7 @@ class TicketControllerTests {
         // GIVEN
         String channelName = "my-channel";
 
-        String requestUri = "/%s/%s/send_ticket_button"
+        String requestUri = "/panel/%s/%s/send_ticket_button"
                 .formatted(serverId, channelId);
 
         RequestBuilder request = get(requestUri)
@@ -84,7 +84,7 @@ class TicketControllerTests {
     @Test
     void refuseTicketButtonFormUnauthenticatedTest() throws Exception {
         // GIVEN
-        String requestUri = "/%s/%s/send_ticket_button"
+        String requestUri = "/panel/%s/%s/send_ticket_button"
                 .formatted(serverId, channelId);
 
         RequestBuilder request = get(requestUri);
@@ -105,7 +105,7 @@ class TicketControllerTests {
         String body = "content=%s"
                 .formatted(URLEncoder.encode(content, StandardCharsets.UTF_8));
 
-        String requestUri = "/%s/%s/send_ticket_button"
+        String requestUri = "/panel/%s/%s/send_ticket_button"
                 .formatted(serverId, channelId);
 
         RequestBuilder request = post(requestUri)
@@ -130,7 +130,7 @@ class TicketControllerTests {
     @Test
     void refuseTicketButtonUnauthenticatedTest() throws Exception {
         // GIVEN
-        String requestUri = "/%s/%s/send_ticket_button"
+        String requestUri = "/panel/%s/%s/send_ticket_button"
                 .formatted(serverId, channelId);
 
         RequestBuilder request = post(requestUri)
@@ -148,7 +148,7 @@ class TicketControllerTests {
     @Test
     void refuseToSendTicketButtonWithNullBodyTest() throws Exception {
         // GIVEN
-        String requestUri = "/%s/%s/send_ticket_button"
+        String requestUri = "/panel/%s/%s/send_ticket_button"
                 .formatted(serverId, channelId);
 
         RequestBuilder request = post(requestUri)
@@ -176,7 +176,7 @@ class TicketControllerTests {
         String body = "content=%s"
                 .formatted(URLEncoder.encode(content, StandardCharsets.UTF_8));
 
-        String requestUri = "/%s/%s/send_ticket_button"
+        String requestUri = "/panel/%s/%s/send_ticket_button"
                 .formatted(serverId, channelId);
 
         RequestBuilder request = post(requestUri)
@@ -206,7 +206,7 @@ class TicketControllerTests {
         String body = "content=%s"
                 .formatted(URLEncoder.encode(content, StandardCharsets.UTF_8));
 
-        String requestUri = "/%s/%s/send_ticket_button"
+        String requestUri = "/panel/%s/%s/send_ticket_button"
                 .formatted(serverId, channelId);
 
         RequestBuilder request = post(requestUri)

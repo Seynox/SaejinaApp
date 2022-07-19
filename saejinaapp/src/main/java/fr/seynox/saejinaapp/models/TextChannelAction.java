@@ -28,6 +28,11 @@ public enum TextChannelAction implements Selectable {
         return this.toString().toLowerCase();
     }
 
+    @Override
+    public String getIconUrl() {
+        return null;
+    }
+
     public boolean isAllowed(Member member, TextChannel channel) {
         return validation.isAllowed(member, channel);
     }

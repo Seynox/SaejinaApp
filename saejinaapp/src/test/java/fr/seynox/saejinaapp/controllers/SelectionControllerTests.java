@@ -2,7 +2,6 @@ package fr.seynox.saejinaapp.controllers;
 
 import fr.seynox.saejinaapp.exceptions.ResourceNotAccessibleException;
 import fr.seynox.saejinaapp.models.Selectable;
-import fr.seynox.saejinaapp.models.Server;
 import fr.seynox.saejinaapp.models.SelectableImpl;
 import fr.seynox.saejinaapp.models.TextChannelAction;
 import fr.seynox.saejinaapp.services.MemberAccessService;
@@ -42,13 +41,13 @@ class SelectionControllerTests {
         // GIVEN
         String userId = "123456789";
 
-        String requestUrl = "/";
+        String requestUrl = "/panel";
         RequestBuilder request = get(requestUrl)
                 .with(oauth2Login().attributes(attrs -> attrs.put("sub", userId))); // "sub" is the default nameAttributeKey
 
-        List<Server> serverList = List.of(
-                new Server("Server One", null, 123456L),
-                new Server("Server Two", null, 987654L)
+        List<Selectable> serverList = List.of(
+                new SelectableImpl(123456L, null, "Server One"),
+                new SelectableImpl(987654L, null, "Server Two")
         );
 
         when(service.getUserServers(userId)).thenReturn(serverList);
@@ -81,7 +80,7 @@ class SelectionControllerTests {
         String userId = "456123";
         long serverId = 123456;
 
-        String requestUri = "/" + serverId;
+        String requestUri = "/panel/" + serverId;
         RequestBuilder request = get(requestUri)
                 .with(oauth2Login().attributes(attrs -> attrs.put("sub", userId))); // "sub" is the default nameAttributeKey
 
@@ -110,7 +109,7 @@ class SelectionControllerTests {
         String userId = "456123";
         long serverId = 123456;
 
-        String requestUri = "/" + serverId;
+        String requestUri = "/panel/" + serverId;
         RequestBuilder request = get(requestUri)
                 .with(oauth2Login().attributes(attrs -> attrs.put("sub", userId))); // "sub" is the default nameAttributeKey
 
@@ -153,7 +152,7 @@ class SelectionControllerTests {
         Member member = Mockito.mock(Member.class);
         TextChannel channel = Mockito.mock(TextChannel.class);
 
-        String requestUri = "/%s/%s".formatted(serverId, channelId);
+        String requestUri = "/panel/%s/%s".formatted(serverId, channelId);
         RequestBuilder request = get(requestUri)
                 .with(oauth2Login().attributes(attrs -> attrs.put("sub", userId))); // "sub" is the default nameAttributeKey
 
@@ -180,7 +179,7 @@ class SelectionControllerTests {
         String serverId = "123456";
         String channelId = "654321";
 
-        String requestUri = "/%s/%s".formatted(serverId, channelId);
+        String requestUri = "/panel/%s/%s".formatted(serverId, channelId);
         RequestBuilder request = get(requestUri);
 
         // WHEN

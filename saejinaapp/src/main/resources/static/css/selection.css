@@ -1,0 +1,69 @@
+html {
+    background-color: #0d1315;
+    background-image: url("/images/background.png");
+    background-size: cover;
+    font-family: 'Roboto Light', sans-serif;
+}
+
+html, body, .center {
+    height: 90%;
+}
+
+h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    color: white;
+    text-transform: uppercase;
+    font-size: xxx-large;
+}
+
+p, a {
+    color: white;
+    font-size: larger;
+    text-decoration: none;
+    text-align: center;
+    margin: 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: 1em;
+}
+
+.center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.selectables {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    width: 80%;
+}
+
+.selectable {
+    height: 70%;
+    width: 10em;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 20%;
+    padding: 1.5em;
+    margin-top: 1em;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+img {
+    border-radius: 50%;
+    margin-bottom: 1em;
+    width: 8em;
+}
+
+#back {
+    color: #CFE8E4;
+}
