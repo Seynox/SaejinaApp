@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <link th:href="@{/css/main.css}" rel="stylesheet" type="text/css">
-    <link th:href="@{/css/selectables.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/css/list.css}" rel="stylesheet" type="text/css">
     <title th:text="${pageTitle}"></title>
 </head>
 <body>
@@ -16,10 +16,10 @@
     <div class="center">
         <h1 th:text="${title}"></h1>
         <div class="selectables">
-            <a class="selectable" th:href="@{{id}/(id=${selectable.getId()})}" th:each="selectable : ${selectableList}">
-                <img th:src="${selectable.getIconUrl() != null ? selectable.getIconUrl() : '/images/defaultIcon.png'}" th:alt="${selectable.getName()}" alt="Server Picture">
-                <p th:text="${selectable.getName()}"></p>
-            </a>
+            <a class="selectable"
+               th:each="selectable : ${selectableList}"
+               th:href="@{{id}/(id=${selectable.getId()})}"
+               th:text="${selectable.getName()}"></a>
         </div>
     </div>
 </body>

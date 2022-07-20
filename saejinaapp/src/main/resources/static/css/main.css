@@ -1,0 +1,46 @@
+html {
+    background-color: #0d1518;
+    background-image: url("/images/background.png");
+    background-size: cover;
+    font-family: 'Roboto Light', sans-serif;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    color: white;
+    text-transform: uppercase;
+    margin-top: 0;
+}
+
+p, a {
+    color: white;
+    font-size: larger;
+    text-decoration: none;
+    text-align: center;
+    margin: 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: 1em;
+}
+
+.center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    margin-top: -64px;
+    padding-top: 64px;
+    box-sizing: border-box;
+}
+
+#back {
+    color: #CFE8E4;
+}

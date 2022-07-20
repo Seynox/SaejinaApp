@@ -73,7 +73,7 @@ public class SelectionController {
         model.addAttribute(PAGE_TITLE_ATTRIBUTE, "Channel Selection");
         model.addAttribute(MAIN_TITLE_ATTRIBUTE, "Select a channel :");
 
-        return SELECTION_TEMPLATE;
+        return "/selection/select_list";
     }
 
     /**

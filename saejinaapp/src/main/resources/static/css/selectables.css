@@ -1,0 +1,32 @@
+.selectables {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    width: 80%;
+    overflow: scroll;
+}
+
+.selectable {
+    width: 9em;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 10%;
+    padding: 1.5em;
+    margin-top: 1em;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.selectable p {
+    width: 100%;
+    overflow-x: clip;
+    text-overflow: ellipsis;
+}
+
+img {
+    border-radius: 50%;
+    margin-bottom: 1em;
+    width: 8em;
+}
