@@ -15,9 +15,10 @@ h1 {
     color: white;
     text-transform: uppercase;
     margin-top: 0;
+    text-align: center;
 }
 
-p, a {
+p, a, label {
     color: white;
     font-size: larger;
     text-decoration: none;
@@ -44,4 +45,8 @@ header {
 
 #back {
     color: #CFE8E4;
+}
+
+.success {
+    font-size: larger;
 }

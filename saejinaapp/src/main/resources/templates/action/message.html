@@ -4,40 +4,44 @@
       lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Send Message</title>
+    <link th:href="@{/css/main.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/css/message.css}" rel="stylesheet" type="text/css">
+    <title>Send Message to channel</title>
 </head>
 <body>
-    <div>
-        Logged in as user: <b th:inline="text"> [[${#httpServletRequest.remoteUser}]] </b>
-    </div>
-    <div th:if="${param.keySet().contains('success')}">
-        <p class="success">The message was successfully sent !</p>
-    </div>
+    <header>
+        <a id="back" href="../">&#x25c0; Go back</a>
+        <a href="/logout">Logout</a>
+    </header>
+    <div class="center">
+        <div th:if="${param.keySet().contains('success')}">
+            <p class="success">The message was successfully sent !</p>
+        </div>
 
-    <h1>Send a message to <b th:text="${channelName}"></b></h1>
-    <div>
-        <form th:object="${message}" method="post">
+        <h1>Send a message to #<b th:text="${channelName}"></b>:</h1>
+        <div class="container">
+            <form th:object="${message}" method="post">
 
-            <p th:if="${#fields.hasErrors('content')}" class="text-danger" th:errors="*{content}"></p>
-            <label for="content">Message :</label>
-            <textarea id="content" th:field="*{content}" minlength="1" maxlength="2000" autofocus></textarea>
+                <p th:if="${#fields.hasErrors('content')}" class="text-danger" th:errors="*{content}"></p>
+                <textarea id="content" th:field="*{content}" minlength="1" maxlength="2000" autofocus></textarea>
 
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
-            <input type="submit" value="Send">
-        </form>
-    </div>
-    <div>
-        <label for="mentions">Add a mention :</label>
-        <select id="mentions" onchange="addMentionToMessage(this.value); this.selectedIndex = -1;">
-            <option value="" hidden></option>
-            <optgroup label="Roles">
-                <option th:each="role : ${mentionableRoles}" th:text="${role.getName()}" th:value="${role.getId()}"></option>
-            </optgroup>
-            <optgroup label="Users">
-                <option th:each="user : ${mentionableUsers}" th:text="${user.getName()}" th:value="${user.getId()}"></option>
-            </optgroup>
-        </select>
+                <input type="submit" value="Send">
+            </form>
+            <div class="mentionsMenu">
+                <label for="mentions">Add a mention :</label>
+                <select id="mentions" onchange="addMentionToMessage(this.value); this.selectedIndex = -1;">
+                    <option value="" hidden></option>
+                    <optgroup label="Roles">
+                        <option th:each="role : ${mentionableRoles}" th:text="${role.getName()}" th:value="${role.getId()}"></option>
+                    </optgroup>
+                    <optgroup label="Users">
+                        <option th:each="user : ${mentionableUsers}" th:text="${user.getName()}" th:value="${user.getId()}"></option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
     </div>
     <script>
         function addMentionToMessage(mention) {
