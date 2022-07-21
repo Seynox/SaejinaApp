@@ -4,20 +4,22 @@
       lang="en">
 <head>
     <meta charset="UTF-8">
+    <link th:href="@{/css/main.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/css/button.css}" rel="stylesheet" type="text/css">
     <title>Send Ticket Button</title>
 </head>
 <body>
-    <div>
-        Logged in as user: <b th:inline="text"> [[${#httpServletRequest.remoteUser}]] </b>
-    </div>
+    <header>
+        <a id="back" href="../">&#x25c0; Go back</a>
+        <a href="/logout">Logout</a>
+    </header>
     <div th:if="${param.keySet().contains('success')}">
         <p class="success">The ticket button was successfully sent !</p>
     </div>
 
-    <h1>Send a button used to create tickets to <b th:text="${channelName}"></b></h1>
-    <div>
+    <div class="center">
+        <h1>Send ticket creation button to #<b th:text="${channelName}"></b>:</h1>
         <form th:object="${buttonLabel}" method="post">
-
             <p th:if="${#fields.hasErrors('content')}" class="text-danger" th:errors="*{content}"></p>
             <label for="content">Button label :</label>
             <input type="text" id="content" th:field="*{content}" minlength="1" maxlength="80" autofocus />

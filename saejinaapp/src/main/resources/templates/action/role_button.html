@@ -4,18 +4,21 @@
       lang="en">
 <head>
     <meta charset="UTF-8">
+    <link th:href="@{/css/main.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/css/button.css}" rel="stylesheet" type="text/css">
     <title>Send Role Button</title>
 </head>
 <body>
-    <div>
-        Logged in as user: <b th:inline="text"> [[${#httpServletRequest.remoteUser}]] </b>
-    </div>
-    <div th:if="${param.keySet().contains('success')}">
-        <p class="success">The role assignment button was successfully sent !</p>
-    </div>
+    <header>
+        <a id="back" href="../">&#x25c0; Go back</a>
+        <a href="/logout">Logout</a>
+    </header>
+    <div class="center">
+        <div th:if="${param.keySet().contains('success')}">
+            <p class="success">The role assignment button was successfully sent !</p>
+        </div>
 
-    <h1>Send to <b th:text="${channelName}"></b> a button used to assign a role</h1>
-    <div>
+        <h1>Send role assignment button to #<b th:text="${channelName}"></b>:</h1>
         <form th:object="${roleId}" method="post">
 
             <p th:if="${#fields.hasErrors('id')}" class="text-danger" th:errors="*{id}"></p>
