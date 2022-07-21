@@ -116,8 +116,8 @@ class SelectionControllerTests {
         when(accessService.getServerMember(userId, serverId)).thenThrow(new ResourceNotAccessibleException());
         // WHEN
         mockMvc.perform(request)
-                .andExpect(status().isOk())
-                .andExpect(view().name("/exception/error"));
+                .andExpect(status().isInternalServerError())
+                .andExpect(view().name("/error"));
 
         // THEN
         verify(accessService).getServerMember(userId, serverId);

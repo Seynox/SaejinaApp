@@ -1,0 +1,10 @@
+h1 {
+    color: #CFE8E4;
+}
+
+a {
+    margin: 1em;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 0.4em;
+    border-radius: 10px;
+}
