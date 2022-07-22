@@ -13,11 +13,10 @@
         <a id="back" href="../">&#x25c0; Go back</a>
         <a href="/logout">Logout</a>
     </header>
-    <div th:if="${param.keySet().contains('success')}">
-        <p class="success">The ticket button was successfully sent !</p>
-    </div>
-
     <div class="center">
+        <div th:if="${param.keySet().contains('success')}">
+            <p class="success">The ticket button was successfully sent !</p>
+        </div>
         <h1>Send ticket creation button to #<b th:text="${channelName}"></b>:</h1>
         <form th:object="${buttonLabel}" method="post">
             <p th:if="${#fields.hasErrors('content')}" class="text-danger" th:errors="*{content}"></p>
