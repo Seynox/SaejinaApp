@@ -13,4 +13,6 @@ WORKDIR saejinaapp
 
 COPY --from=builder /saejinaapp/target/saejina-app.jar .
 
+EXPOSE 8080
+
 CMD ["java", "-jar", "/saejinaapp/saejina-app.jar"]

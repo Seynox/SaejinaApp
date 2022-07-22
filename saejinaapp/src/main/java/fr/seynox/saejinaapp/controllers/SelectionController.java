@@ -21,7 +21,7 @@ import java.util.List;
 @RequestMapping("/panel")
 public class SelectionController {
 
-    private static final String SELECTION_TEMPLATE = "/selection/select";
+    private static final String SELECTION_TEMPLATE = "selection/select";
     private static final String SELECTABLE_LIST_ATTRIBUTE = "selectableList";
     private static final String PAGE_TITLE_ATTRIBUTE = "pageTitle";
     private static final String MAIN_TITLE_ATTRIBUTE = "title";
@@ -73,7 +73,7 @@ public class SelectionController {
         model.addAttribute(PAGE_TITLE_ATTRIBUTE, "Channel Selection");
         model.addAttribute(MAIN_TITLE_ATTRIBUTE, "Select a channel :");
 
-        return "/selection/select_list";
+        return "selection/select_list";
     }
 
     /**

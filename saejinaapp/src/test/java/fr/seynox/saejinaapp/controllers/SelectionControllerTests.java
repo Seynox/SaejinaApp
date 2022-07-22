@@ -117,7 +117,7 @@ class SelectionControllerTests {
         // WHEN
         mockMvc.perform(request)
                 .andExpect(status().isInternalServerError())
-                .andExpect(view().name("/error"));
+                .andExpect(view().name("error"));
 
         // THEN
         verify(accessService).getServerMember(userId, serverId);
@@ -164,7 +164,7 @@ class SelectionControllerTests {
         // WHEN
         mockMvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(view().name("/selection/select"))
+                .andExpect(view().name("selection/select"))
                 .andExpect(model().attribute("selectableList", actions));
 
         // THEN

@@ -50,7 +50,7 @@ public class TicketController {
         model.addAttribute("buttonLabel", new StringRequest());
         model.addAttribute(CHANNEL_NAME_ATTRIBUTE, channel.getName());
 
-        return "/action/ticket_button";
+        return "action/ticket_button";
     }
 
     /**
@@ -73,7 +73,7 @@ public class TicketController {
         if(result.hasErrors()) {
             model.addAttribute("buttonLabel", buttonLabel);
             model.addAttribute(CHANNEL_NAME_ATTRIBUTE, channel.getName());
-            return "/action/ticket_button";
+            return "action/ticket_button";
         }
 
         service.sendTicketButtonInChannel(member, channel, buttonLabel.getContent());

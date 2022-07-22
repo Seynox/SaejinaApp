@@ -51,7 +51,7 @@ public class RoleController {
         model.addAttribute("roleId", new IdRequest());
         model.addAttribute(CHANNEL_NAME_ATTRIBUTE, channel.getName());
 
-        return "/action/role_button";
+        return "action/role_button";
     }
 
     /**
@@ -74,7 +74,7 @@ public class RoleController {
         if(result.hasErrors()) {
             model.addAttribute("roleId", roleRequest);
             model.addAttribute(CHANNEL_NAME_ATTRIBUTE, channel.getName());
-            return "/action/role_button";
+            return "action/role_button";
         }
 
         Long roleId = roleRequest.getId();

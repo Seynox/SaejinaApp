@@ -58,7 +58,7 @@ public class MessageController {
         model.addAttribute("message", new StringRequest());
         model.addAttribute(CHANNEL_NAME_ATTRIBUTE, channel.getName());
 
-        return "/action/message";
+        return "action/message";
     }
 
     /**
@@ -81,7 +81,7 @@ public class MessageController {
         if(result.hasErrors()) {
             model.addAttribute("message", message);
             model.addAttribute(CHANNEL_NAME_ATTRIBUTE, channel.getName());
-            return "/action/message";
+            return "action/message";
         }
 
         service.sendMessageInChannel(member, channel, message.getContent());

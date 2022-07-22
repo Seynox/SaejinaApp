@@ -74,7 +74,7 @@ class TicketControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("buttonLabel"))
                 .andExpect(model().attribute("channelName", channelName))
-                .andExpect(view().name("/action/ticket_button"));
+                .andExpect(view().name("action/ticket_button"));
 
         // THEN
         verify(accessService).getServerMember(userId, serverId);

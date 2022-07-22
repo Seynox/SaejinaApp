@@ -15,7 +15,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @ControllerAdvice
 public class ExceptionController {
 
-    private static final String ERROR_TEMPLATE_PATH = "/error";
+    private static final String ERROR_TEMPLATE_PATH = "error";
     private static final String ERROR_MESSAGE_ATTRIBUTE = "message";
 
     /**
@@ -33,7 +33,7 @@ public class ExceptionController {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public String send404PageOnBadRequest() {
-        return "/error/404";
+        return "error/404";
     }
 
 }
